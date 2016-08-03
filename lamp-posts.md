@@ -8,7 +8,7 @@ Arduino nano
 
 12v SLA battery
  * 20ah
- * From recovered servers - Pete said he can hook us up with some
+ * From recovered servers - Pirate Pete said he can hook us up with some
 
 WS2812b strip
  * black pcb
