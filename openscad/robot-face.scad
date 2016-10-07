@@ -17,9 +17,8 @@ OVERSIZE = 20;
 STAKE_LENGTH=40;
 
 faceMain();
-//translate([0,0,ENCLOSURE_HEIGHT+10])
-//rotate([0,180,0])
-//    lid();
+translate([0,0,50])
+    facePlate();
 
 IPD = 50;
 
@@ -72,8 +71,22 @@ module faceMain() {
                 }
             }
         }
-        
-        
+    }
+}
+
+module facePlate() {
+    union () {
+        translate([-IPD / 2, 0, 0])
+            cylinder(h=faceDepth, d=occipitalDiameterA + thickness, center=true);
+        translate([IPD / 2, 0, 0])
+            cylinder(h=faceDepth, d=occipitalDiameterB + thickness, center=true);
+
+        translate([0, jawDepth - jawOffset, 0]) {
+            cube([jawWidth + thickness, jawDepth + thickness, faceDepth], center=true);
+            translate([0, jawDepth / 2, 0]) {
+                cylinder(h=faceDepth, d=jawWidth + thickness, center=true);
+            }
+        }
     }
 }
 

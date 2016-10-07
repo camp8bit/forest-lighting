@@ -24,11 +24,17 @@ rotate([0,180,0])
 module box() {
     union () {
 
-        translate([BOARD_W - 5, 2, 10.5])
-            cube([10,10,2]);
+        translate([BOARD_W, 8, 0])
+            difference () {
+                cube([10,10,ENCLOSURE_HEIGHT], center = true);
+                cube([5,5,ENCLOSURE_HEIGHT + 2], center = true);
+            }
         
-        translate([-BOARD_W - 5, -12, 10.5])
-            cube([10,10,2]);
+        translate([-BOARD_W, -8, 0])
+            difference () {
+                cube([10,10,ENCLOSURE_HEIGHT], center = true);
+                cube([5,5,ENCLOSURE_HEIGHT + 2], center = true);
+            }
         
         difference() {
             roundedCube(BOARD_W+ OVERSIZE + 5, BOARD_H+5, ENCLOSURE_HEIGHT, 5);
