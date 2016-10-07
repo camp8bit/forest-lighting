@@ -31,7 +31,12 @@ thickness = 2;
 // This has to be enough to accomodate the PIR PCB
 occipitalDiameterA = 42 + 30;
 occipitalDiameterB = 42 + 15 ;
-faceDepth = 20;
+
+// Fake eye
+eyeDiameter = 38;
+
+// Depth of the face
+faceDepth = 40;
 
 // The lower part of the face
 jawWidth = 50;
@@ -76,17 +81,36 @@ module faceMain() {
 
 module facePlate() {
     union () {
-        translate([-IPD / 2, 0, 0])
-            cylinder(h=faceDepth, d=occipitalDiameterA + thickness, center=true);
-        translate([IPD / 2, 0, 0])
-            cylinder(h=faceDepth, d=occipitalDiameterB + thickness, center=true);
-
-        translate([0, jawDepth - jawOffset, 0]) {
-            cube([jawWidth + thickness, jawDepth + thickness, faceDepth], center=true);
-            translate([0, jawDepth / 2, 0]) {
-                cylinder(h=faceDepth, d=jawWidth + thickness, center=true);
+        // Fake eye
+        translate([IPD / 2, 0, 0]) {
+            difference() {
+                sphere(d=eyeDiameter, center=true);
+                translate([0, 0, -eyeDiameter / 2])
+                    cube([eyeDiameter, eyeDiameter, eyeDiameter], center = true);
             }
         }
+        
+        // Occipital
+        difference () {
+            union () {
+                translate([-IPD / 2, 0, 0])
+                    cylinder(h=thickness, d=occipitalDiameterA, center=true);
+                translate([IPD / 2, 0, 0])
+                    cylinder(h=thickness, d=occipitalDiameterB, center=true);
+
+                // Jaw
+                translate([0, jawDepth - jawOffset, 0]) {
+                    cube([jawWidth, jawDepth, thickness], center=true);
+                    translate([0, jawDepth / 2, 0]) {
+                        cylinder(h=thickness, d=jawWidth, center=true);
+                    }
+                }
+            }
+
+            translate([-IPD / 2, 0, 0])
+                cylinder(h=thickness + epsilon, d=ORB_D, center=true);
+        }
+        
     }
 }
 
