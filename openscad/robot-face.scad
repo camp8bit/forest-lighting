@@ -39,7 +39,7 @@ occipitalDiameterB = 42 - 10;
 eyeDiameter = pirDiameter - 3;
 
 // Depth of the face - needs to be deep enough for a nano and PIR(21mm)
-faceDepth = 40;
+faceDepth = 30;
 
 // The lower part of the face
 jawWidth = 30;
@@ -49,6 +49,9 @@ jawDepth = 60;
 
 // How far down the face is the jaw?
 jawOffset = 40;
+
+// Size of the mouth
+mouthSize = 20;
 
 module faceMain() {
     difference () {
@@ -105,9 +108,27 @@ module facePlate() {
 
                 // Jaw
                 translate([0, jawDepth - jawOffset, 0]) {
-                    cube([jawWidth, jawDepth, thickness], center=true);
-                    translate([0, jawDepth / 2, 0]) {
-                        cylinder(h=thickness, d=jawWidth, center=true);
+                    difference() {
+                        union () {
+                            cube([jawWidth, jawDepth, thickness], center=true);
+                            translate([0, jawDepth / 2, 0])
+                                cylinder(h=thickness, d=jawWidth, center=true);
+                        }
+
+                        translate([0, jawDepth / 2, thickness / 2]) {
+                            difference () {
+                                cylinder(h=thickness, d=mouthSize, center=true);
+
+                                union () {
+                                    translate([-5, -8, 0])
+                                        cube([5, 10, thickness + epsilon], center = true);
+                                    translate([5, -8, 0])
+                                        cube([5, 10, thickness + epsilon], center = true);
+                                    translate([0, 10, 0])
+                                        cube([5, 10, thickness + epsilon], center = true);
+                                }
+                            }
+                        }                            
                     }
                 }
             }
