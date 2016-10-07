@@ -1,6 +1,8 @@
 $fs=1;
 
-ORB_D=22.2;
+ORB_D=22.5;
+pirDiameter = ORB_D;
+
 BOX_W=23.3;
 BOARD_W=32.5;
 BOARD_H=24.3;
@@ -20,7 +22,8 @@ faceMain();
 translate([0,0,50])
     facePlate();
 
-IPD = 50;
+// Inter pupilllary distance
+IPD = 30;
 
 // For preventing z-fighting
 epsilon = 0.1;
@@ -29,18 +32,20 @@ epsilon = 0.1;
 thickness = 2;
 
 // This has to be enough to accomodate the PIR PCB
-occipitalDiameterA = 42 + 30;
-occipitalDiameterB = 42 + 15 ;
+occipitalDiameterA = 42;
+occipitalDiameterB = 42 - 10;
 
 // Fake eye
-eyeDiameter = 38;
+eyeDiameter = pirDiameter - 3;
 
-// Depth of the face
+// Depth of the face - needs to be deep enough for a nano and PIR(21mm)
 faceDepth = 40;
 
 // The lower part of the face
-jawWidth = 50;
-jawDepth = 80;
+jawWidth = 30;
+
+// The jaw needs to be tall enough for a nano + a buck converter (43mm each)
+jawDepth = 60;
 
 // How far down the face is the jaw?
 jawOffset = 40;
