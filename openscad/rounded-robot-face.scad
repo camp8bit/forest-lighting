@@ -75,6 +75,30 @@ module faceMain() {
             translate([0, jawDepth / 2 + jawOffset - 5, 0])
                 rotate([90,0,0])
                     cylinder(h=5, d=10, center = true);
+            
+            // Bottom Mounting tab
+            translate([0, 72, -faceDepth / 2 + thickness / 2]){
+                difference () {
+                    union () {
+                        translate([0, -7, 0])
+                            cube([15, 15, thickness], center = true);
+                        cylinder(h=thickness, d = 15, center = true);
+                    }
+                    cylinder(h=thickness + epsilon, d = 6, center = true);
+                }
+            }
+
+            // Top Mounting tab
+            translate([0, -25, -faceDepth / 2 + thickness / 2]){
+                difference () {
+                    union () {
+                        translate([0, 7, 0])
+                            cube([15, 15, thickness], center = true);
+                        cylinder(h=thickness, d = 15, center = true);
+                    }
+                    cylinder(h=thickness + epsilon, d = 6, center = true);
+                }
+            }
         }
         
         union () {
