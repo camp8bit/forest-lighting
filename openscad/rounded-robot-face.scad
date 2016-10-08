@@ -32,7 +32,7 @@ epsilon = 0.1;
 thickness = 3;
 
 // This has to be enough to accomodate the PIR PCB
-occipitalDiameterA = 42;
+occipitalDiameterA = 44 + thickness * 2;
 occipitalDiameterB = 42 - 10;
 
 // Fake eye
@@ -89,7 +89,7 @@ module faceMain() {
             }
 
             // Top Mounting tab
-            translate([0, -25, -faceDepth / 2 + thickness / 2]){
+            translate([0, -28, -faceDepth / 2 + thickness / 2]){
                 difference () {
                     union () {
                         translate([0, 7, 0])
