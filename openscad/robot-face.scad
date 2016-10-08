@@ -53,34 +53,42 @@ jawOffset = 40;
 // Size of the mouth
 mouthSize = 20;
 
+// Size of forehead
+foreheadOffset = 15;
+foreheadWidth = 50;
+foreheadHeight = 20;
+
 module faceMain() {
     difference () {
         union () {
+            // Forehead
+            translate([0, -foreheadOffset, 0]) {
+                cube([foreheadWidth + thickness, foreheadHeight + thickness, faceDepth], center=true);
+            }
+            
+            // Eyes
             translate([-IPD / 2, 0, 0])
                 cylinder(h=faceDepth, d=occipitalDiameterA + thickness, center=true);
             translate([IPD / 2, 0, 0])
                 cylinder(h=faceDepth, d=occipitalDiameterB + thickness, center=true);
 
+            // Jaw  
             translate([0, jawDepth - jawOffset, 0]) {
                 cube([jawWidth + thickness, jawDepth + thickness, faceDepth], center=true);
-                translate([0, jawDepth / 2, 0]) {
-                    cylinder(h=faceDepth, d=jawWidth + thickness, center=true);
-                }
             }
         }
         
         union () {
             translate([0, 0, thickness + epsilon]) {
+                // Eyes
                 translate([-IPD / 2, 0, 0])
                     cylinder(h=faceDepth + epsilon, d=occipitalDiameterA, center=true);
                 translate([IPD / 2, 0, 0])
                     cylinder(h=faceDepth + epsilon, d=occipitalDiameterB, center=true);
 
+                // Jaw
                 translate([0, jawDepth - jawOffset, 0]) {
                     cube([jawWidth, jawDepth, faceDepth + epsilon], center=true);
-                    translate([0, jawDepth / 2, 0]) {
-                        cylinder(h=faceDepth + epsilon, d=jawWidth, center=true);
-                    }
                 }
             }
         }
@@ -111,26 +119,10 @@ module facePlate() {
                     difference() {
                         union () {
                             cube([jawWidth, jawDepth, thickness], center=true);
-                            translate([0, jawDepth / 2, 0])
-                                cylinder(h=thickness, d=jawWidth, center=true);
                         }
 
-                        translate([0, jawDepth / 2, thickness / 2]) {
-                            difference () {
-                                // Mouth hole
-                                cylinder(h=thickness, d=mouthSize, center=true);
-
-                                // Teeth
-                                union () {
-                                    translate([-5, -8, 0])
-                                        cube([5, 10, thickness + epsilon], center = true);
-                                    translate([5, -8, 0])
-                                        cube([5, 10, thickness + epsilon], center = true);
-                                    translate([0, 10, 0])
-                                        cube([5, 10, thickness + epsilon], center = true);
-                                }
-                            }
-                        }                            
+                        translate([0, jawDepth / 3, thickness / 2])
+                            cube([20, 5, thickness + epsilon], center = true);
                     }
                 }
             }

@@ -29,7 +29,7 @@ IPD = 30;
 epsilon = 0.1;
 
 // Thickness of all walls
-thickness = 2;
+thickness = 3;
 
 // This has to be enough to accomodate the PIR PCB
 occipitalDiameterA = 42;
@@ -53,6 +53,9 @@ jawOffset = 40;
 // Size of the mouth
 mouthSize = 20;
 
+// Step size
+stepSize = thickness * 2;
+
 module faceMain() {
     difference () {
         union () {
@@ -67,22 +70,49 @@ module faceMain() {
                     cylinder(h=faceDepth, d=jawWidth + thickness, center=true);
                 }
             }
+
+            // Cable hole
+            translate([0, jawDepth / 2 + jawOffset - 5, 0])
+                rotate([90,0,0])
+                    cylinder(h=5, d=10, center = true);
         }
         
         union () {
-            translate([0, 0, thickness + epsilon]) {
+            // Cable hole
+            translate([0, jawDepth / 2 + jawOffset - 5, 0])
+                rotate([90,0,0])
+                    cylinder(h=10 + epsilon, d=8, center = true);
+            
+            // Interior space
+            translate([0, 0, thickness + epsilon - thickness]) {
                 translate([-IPD / 2, 0, 0])
-                    cylinder(h=faceDepth + epsilon, d=occipitalDiameterA, center=true);
+                    cylinder(h=faceDepth + epsilon - thickness, d=occipitalDiameterA - stepSize, center=true);
                 translate([IPD / 2, 0, 0])
-                    cylinder(h=faceDepth + epsilon, d=occipitalDiameterB, center=true);
+                    cylinder(h=faceDepth + epsilon - thickness, d=occipitalDiameterB - stepSize, center=true);
 
                 translate([0, jawDepth - jawOffset, 0]) {
-                    cube([jawWidth, jawDepth, faceDepth + epsilon], center=true);
+                    cube([jawWidth - stepSize, jawDepth - stepSize, faceDepth + epsilon - thickness], center=true);
                     translate([0, jawDepth / 2, 0]) {
-                        cylinder(h=faceDepth + epsilon, d=jawWidth, center=true);
+                        cylinder(h=faceDepth + epsilon - thickness, d=jawWidth - stepSize, center=true);
                     }
                 }
             }
+
+            // Step
+            translate([0, 0, faceDepth / 2 - thickness / 2]) {
+                translate([-IPD / 2, 0, 0])
+                    cylinder(h=epsilon + thickness, d=occipitalDiameterA, center=true);
+                translate([IPD / 2, 0, 0])
+                    cylinder(h=epsilon + thickness, d=occipitalDiameterB, center=true);
+
+                translate([0, jawDepth - jawOffset, 0]) {
+                    cube([jawWidth, jawDepth, thickness + epsilon], center=true);
+                    translate([0, jawDepth / 2, 0]) {
+                        cylinder(h=thickness + epsilon, d=jawWidth, center=true);
+                    }
+                }
+            }
+            
         }
     }
 }
