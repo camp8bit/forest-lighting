@@ -56,87 +56,104 @@ mouthSize = 20;
 // Step size
 stepSize = thickness * 2;
 
-module faceMain() {
+module screwColumn() {
     difference () {
-        union () {
-            translate([-IPD / 2, 0, 0])
-                cylinder(h=faceDepth, d=occipitalDiameterA + thickness, center=true);
-            translate([IPD / 2, 0, 0])
-                cylinder(h=faceDepth, d=occipitalDiameterB + thickness, center=true);
+        translate([0, 0, -thickness / 2])
+            cylinder(h=faceDepth - thickness, d=6, center=true);
+        cylinder(h=faceDepth + epsilon, d=3, center=true);
+    }
+}
 
-            translate([0, jawDepth - jawOffset, 0]) {
-                cube([jawWidth + thickness, jawDepth + thickness, faceDepth], center=true);
-                translate([0, jawDepth / 2, 0]) {
-                    cylinder(h=faceDepth, d=jawWidth + thickness, center=true);
-                }
-            }
-
-            // Cable hole
-            translate([0, jawDepth / 2 + jawOffset - 5, 0])
-                rotate([90,0,0])
-                    cylinder(h=5, d=10, center = true);
-            
-            // Bottom Mounting tab
-            translate([0, 72, -faceDepth / 2 + thickness / 2]){
-                difference () {
-                    union () {
-                        translate([0, -7, 0])
-                            cube([15, 15, thickness], center = true);
-                        cylinder(h=thickness, d = 15, center = true);
-                    }
-                    cylinder(h=thickness + epsilon, d = 6, center = true);
-                }
-            }
-
-            // Top Mounting tab
-            translate([0, -28, -faceDepth / 2 + thickness / 2]){
-                difference () {
-                    union () {
-                        translate([0, 7, 0])
-                            cube([15, 15, thickness], center = true);
-                        cylinder(h=thickness, d = 15, center = true);
-                    }
-                    cylinder(h=thickness + epsilon, d = 6, center = true);
-                }
-            }
-        }
+module faceMain() {
+    union () {
+        translate([5, -5, 0])
+            screwColumn();
+        translate([-10, 50, 0])
+            screwColumn();
         
-        union () {
-            // Cable hole
-            translate([0, jawDepth / 2 + jawOffset - 5, 0])
-                rotate([90,0,0])
-                    cylinder(h=10 + epsilon, d=8, center = true);
-            
-            // Interior space
-            translate([0, 0, thickness + epsilon - thickness]) {
+        // Outside shell with step
+        difference () {
+            union () {
+                // Occipital lobes
                 translate([-IPD / 2, 0, 0])
-                    cylinder(h=faceDepth + epsilon - thickness, d=occipitalDiameterA - stepSize, center=true);
+                    cylinder(h=faceDepth, d=occipitalDiameterA + thickness, center=true);
                 translate([IPD / 2, 0, 0])
-                    cylinder(h=faceDepth + epsilon - thickness, d=occipitalDiameterB - stepSize, center=true);
+                    cylinder(h=faceDepth, d=occipitalDiameterB + thickness, center=true);
 
+                // Jaw
                 translate([0, jawDepth - jawOffset, 0]) {
-                    cube([jawWidth - stepSize, jawDepth - stepSize, faceDepth + epsilon - thickness], center=true);
+                    cube([jawWidth + thickness, jawDepth + thickness, faceDepth], center=true);
                     translate([0, jawDepth / 2, 0]) {
-                        cylinder(h=faceDepth + epsilon - thickness, d=jawWidth - stepSize, center=true);
+                        cylinder(h=faceDepth, d=jawWidth + thickness, center=true);
+                    }
+                }
+
+                // Cable hole
+                translate([0, jawDepth / 2 + jawOffset - 5, 0])
+                    rotate([90,0,0])
+                        cylinder(h=5, d=10, center = true);
+                
+                // Bottom Mounting tab
+                translate([0, 72, -faceDepth / 2 + thickness / 2]){
+                    difference () {
+                        union () {
+                            translate([0, -7, 0])
+                                cube([15, 15, thickness], center = true);
+                            cylinder(h=thickness, d = 15, center = true);
+                        }
+                        cylinder(h=thickness + epsilon, d = 6, center = true);
+                    }
+                }
+
+                // Top Mounting tab
+                translate([0, -28, -faceDepth / 2 + thickness / 2]){
+                    difference () {
+                        union () {
+                            translate([0, 7, 0])
+                                cube([15, 15, thickness], center = true);
+                            cylinder(h=thickness, d = 15, center = true);
+                        }
+                        cylinder(h=thickness + epsilon, d = 6, center = true);
                     }
                 }
             }
+            
+            union () {
+                // Cable hole
+                translate([0, jawDepth / 2 + jawOffset - 5, 0])
+                    rotate([90,0,0])
+                        cylinder(h=10 + epsilon, d=8, center = true);
+                
+                // Interior space
+                translate([0, 0, thickness + epsilon - thickness]) {
+                    translate([-IPD / 2, 0, 0])
+                        cylinder(h=faceDepth + epsilon - thickness, d=occipitalDiameterA - stepSize, center=true);
+                    translate([IPD / 2, 0, 0])
+                        cylinder(h=faceDepth + epsilon - thickness, d=occipitalDiameterB - stepSize, center=true);
 
-            // Step
-            translate([0, 0, faceDepth / 2 - thickness / 2]) {
-                translate([-IPD / 2, 0, 0])
-                    cylinder(h=epsilon + thickness, d=occipitalDiameterA, center=true);
-                translate([IPD / 2, 0, 0])
-                    cylinder(h=epsilon + thickness, d=occipitalDiameterB, center=true);
+                    translate([0, jawDepth - jawOffset, 0]) {
+                        cube([jawWidth - stepSize, jawDepth - stepSize, faceDepth + epsilon - thickness], center=true);
+                        translate([0, jawDepth / 2, 0]) {
+                            cylinder(h=faceDepth + epsilon - thickness, d=jawWidth - stepSize, center=true);
+                        }
+                    }
+                }
 
-                translate([0, jawDepth - jawOffset, 0]) {
-                    cube([jawWidth, jawDepth, thickness + epsilon], center=true);
-                    translate([0, jawDepth / 2, 0]) {
-                        cylinder(h=thickness + epsilon, d=jawWidth, center=true);
+                // Step
+                translate([0, 0, faceDepth / 2 - thickness / 2]) {
+                    translate([-IPD / 2, 0, 0])
+                        cylinder(h=epsilon + thickness, d=occipitalDiameterA, center=true);
+                    translate([IPD / 2, 0, 0])
+                        cylinder(h=epsilon + thickness, d=occipitalDiameterB, center=true);
+
+                    translate([0, jawDepth - jawOffset, 0]) {
+                        cube([jawWidth, jawDepth, thickness + epsilon], center=true);
+                        translate([0, jawDepth / 2, 0]) {
+                            cylinder(h=thickness + epsilon, d=jawWidth, center=true);
+                        }
                     }
                 }
             }
-            
         }
     }
 }
