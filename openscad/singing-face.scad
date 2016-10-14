@@ -1,6 +1,6 @@
 $fs=1;
 
-ORB_D=24;
+ORB_D=22.5;
 pirDiameter = ORB_D;
 
 BOX_W=23.3;
@@ -23,7 +23,7 @@ translate([0,0,50])
     facePlate();
 
 // Inter pupilllary distance
-IPD = 30;
+IPD = 50;
 
 // For preventing z-fighting
 epsilon = 0.1;
@@ -31,9 +31,11 @@ epsilon = 0.1;
 // Thickness of all walls
 thickness = 3;
 
+speakerDiameter = 57.5;
+
 // This has to be enough to accomodate the PIR PCB
 occipitalDiameterA = 44 + thickness * 2;
-occipitalDiameterB = 42 - 10;
+occipitalDiameterB = speakerDiameter + 30;
 
 // Fake eye
 eyeDiameter = pirDiameter - 3;
@@ -45,10 +47,10 @@ faceDepth = 30;
 jawWidth = 30;
 
 // The jaw needs to be tall enough for a nano + a buck converter (43mm each)
-jawDepth = 100;
+jawDepth = 60;
 
 // How far down the face is the jaw?
-jawOffset = 80;
+jawOffset = 40;
 
 // Size of the mouth
 mouthSize = 20;
@@ -66,12 +68,10 @@ module screwColumn() {
 
 module faceMain() {
     union () {
-        /*
         translate([5, -5, 0])
             screwColumn();
         translate([-10, 50, 0])
             screwColumn();
-        */
         
         // Outside shell with step
         difference () {
@@ -85,6 +85,9 @@ module faceMain() {
                 // Jaw
                 translate([0, jawDepth - jawOffset, 0]) {
                     cube([jawWidth + thickness, jawDepth + thickness, faceDepth], center=true);
+                    translate([0, jawDepth / 2, 0]) {
+                        cylinder(h=faceDepth, d=jawWidth + thickness, center=true);
+                    }
                 }
 
                 // Cable hole
@@ -93,7 +96,7 @@ module faceMain() {
                         cylinder(h=5, d=10, center = true);
                 
                 // Bottom Mounting tab
-                translate([0, 80, -faceDepth / 2 + thickness / 2]){
+                translate([0, 72, -faceDepth / 2 + thickness / 2]){
                     difference () {
                         union () {
                             translate([0, -7, 0])
@@ -130,9 +133,11 @@ module faceMain() {
                     translate([IPD / 2, 0, 0])
                         cylinder(h=faceDepth + epsilon - thickness, d=occipitalDiameterB - stepSize, center=true);
 
-                    // Jaw
                     translate([0, jawDepth - jawOffset, 0]) {
                         cube([jawWidth - stepSize, jawDepth - stepSize, faceDepth + epsilon - thickness], center=true);
+                        translate([0, jawDepth / 2, 0]) {
+                            cylinder(h=faceDepth + epsilon - thickness, d=jawWidth - stepSize, center=true);
+                        }
                     }
                 }
 
@@ -145,6 +150,9 @@ module faceMain() {
 
                     translate([0, jawDepth - jawOffset, 0]) {
                         cube([jawWidth, jawDepth, thickness + epsilon], center=true);
+                        translate([0, jawDepth / 2, 0]) {
+                            cylinder(h=thickness + epsilon, d=jawWidth, center=true);
+                        }
                     }
                 }
             }
@@ -155,39 +163,59 @@ module faceMain() {
 module facePlate() {
     union () {
         // Fake eye
+        /*
         translate([IPD / 2, 0, 0]) {
-            /*difference() {
+            difference() {
                 sphere(d=eyeDiameter, center=true);
                 translate([0, 0, -eyeDiameter / 2])
                     cube([eyeDiameter, eyeDiameter, eyeDiameter], center = true);
-            }*/
+            }
         }
+        */
         
         // Occipital
         difference () {
             union () {
-                translate([-IPD / 2, 0, 0.5])
-                    cylinder(h=thickness + 1, d=occipitalDiameterA, center=true);
-                translate([IPD / 2, 0, 1])
-                    cylinder(h=thickness + 2, d=occipitalDiameterB, center=true);
+                translate([-IPD / 2, 0, 0])
+                    cylinder(h=thickness, d=occipitalDiameterA, center=true);
+                translate([IPD / 2, 0, 0])
+                    cylinder(h=thickness, d=occipitalDiameterB, center=true);
 
                 // Jaw
                 translate([0, jawDepth - jawOffset, 0]) {
                     difference() {
                         union () {
                             cube([jawWidth, jawDepth, thickness], center=true);
+                            translate([0, jawDepth / 2, 0])
+                                cylinder(h=thickness, d=jawWidth, center=true);
                         }
+
+                        translate([0, jawDepth / 2, thickness / 2]) {
+                            difference () {
+                                // Mouth hole
+                                cylinder(h=thickness, d=mouthSize, center=true);
+
+                                // Teeth
+                                union () {
+                                    translate([-5, -8, 0])
+                                        cube([5, 10, thickness + epsilon], center = true);
+                                    translate([5, -8, 0])
+                                        cube([5, 10, thickness + epsilon], center = true);
+                                    translate([0, 10, 0])
+                                        cube([5, 10, thickness + epsilon], center = true);
+                                }
+                            }
+                        }                            
                     }
                 }
             }
 
-            union () {
-                translate([IPD / 2, 0, 4])
-                    cylinder(h=thickness + epsilon, d=10, center=true);
-                
-                translate([-IPD / 2, 0, 0])
-                    cylinder(h=thickness * 10 + epsilon, d=ORB_D, center=true);
-            }
+            // Eye hole
+            translate([-IPD / 2, 0, 0])
+                cylinder(h=thickness + epsilon, d=ORB_D, center=true);
+
+            translate([IPD / 2, 0, 0])
+                cylinder(h=thickness + epsilon, d=speakerDiameter, center=true);
         }
         
     }

@@ -56,6 +56,9 @@ mouthSize = 20;
 // Step size
 stepSize = thickness * 2;
 
+// Switch - https://www.aliexpress.com/item/5PCS-Miniature-Toggle-Switch-25V-6A-ON-ON-2-Position-3-Pins-SPDT-Toggle-Switch-With/32698365509.html
+switchMountHole = 6.5;
+
 module screwColumn() {
     difference () {
         translate([0, 0, -thickness / 2])
@@ -84,13 +87,18 @@ module faceMain() {
 
                 // Jaw
                 translate([0, jawDepth - jawOffset, 0]) {
-                    cube([jawWidth + thickness, jawDepth + thickness, faceDepth], center=true);
+                    roundedCube(jawWidth + thickness, jawDepth + thickness, faceDepth, 6);
                 }
 
                 // Cable hole
-                translate([0, jawDepth / 2 + jawOffset - 5, 0])
+                translate([0, jawDepth / 2 + jawOffset - 58, 0])
                     rotate([90,0,0])
                         cylinder(h=5, d=10, center = true);
+                
+                // Switch hole
+                translate([-jawWidth / 2, 50, 0])
+                    rotate([0,90,0])
+                        cylinder(h=5, d=switchMountHole + 10, center = true);
                 
                 // Bottom Mounting tab
                 translate([0, 80, -faceDepth / 2 + thickness / 2]){
@@ -105,7 +113,7 @@ module faceMain() {
                 }
 
                 // Top Mounting tab
-                translate([0, -28, -faceDepth / 2 + thickness / 2]){
+                translate([0, -38, -faceDepth / 2 + thickness / 2]){
                     difference () {
                         union () {
                             translate([0, 7, 0])
@@ -118,8 +126,13 @@ module faceMain() {
             }
             
             union () {
+                // Switch hole
+                translate([-jawWidth / 2, 50, 0])
+                    rotate([0,90,0])
+                        cylinder(h=10 + epsilon, d=switchMountHole, center = true);
+
                 // Cable hole
-                translate([0, jawDepth / 2 + jawOffset - 5, 0])
+                translate([0, jawDepth / 2 + jawOffset - 58, 0])
                     rotate([90,0,0])
                         cylinder(h=10 + epsilon, d=8, center = true);
                 
@@ -144,7 +157,7 @@ module faceMain() {
                         cylinder(h=epsilon + thickness, d=occipitalDiameterB, center=true);
 
                     translate([0, jawDepth - jawOffset, 0]) {
-                        cube([jawWidth, jawDepth, thickness + epsilon], center=true);
+                        roundedCube(jawWidth, jawDepth, thickness + epsilon, 6);
                     }
                 }
             }
@@ -175,7 +188,8 @@ module facePlate() {
                 translate([0, jawDepth - jawOffset, 0]) {
                     difference() {
                         union () {
-                            cube([jawWidth, jawDepth, thickness], center=true);
+                            roundedCube(jawWidth, jawDepth, thickness, 6);
+                            // cube([jawWidth, jawDepth, thickness], center=true);
                         }
                     }
                 }
@@ -187,6 +201,9 @@ module facePlate() {
                 
                 translate([-IPD / 2, 0, 0])
                     cylinder(h=thickness * 10 + epsilon, d=ORB_D, center=true);
+                
+                translate([0, 55, thickness / 2])
+                    roundedCube(20, 10, thickness + epsilon, 6);
             }
         }
         
