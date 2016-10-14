@@ -59,22 +59,33 @@ stepSize = thickness * 2;
 // Switch - https://www.aliexpress.com/item/5PCS-Miniature-Toggle-Switch-25V-6A-ON-ON-2-Position-3-Pins-SPDT-Toggle-Switch-With/32698365509.html
 switchMountHole = 6.5;
 
+// Screw
+screwDiameter = 3;
+
 module screwColumn() {
     difference () {
         translate([0, 0, -thickness / 2])
-            cylinder(h=faceDepth - thickness, d=6, center=true);
-        cylinder(h=faceDepth + epsilon, d=3, center=true);
+            cylinder(h=faceDepth - thickness, d=screwDiameter * 2, center=true);
+        cylinder(h=faceDepth + epsilon, d=screwDiameter, center=true);
     }
+}
+
+module screwHole () {
+    // Oversize the screw holes by 1mm
+    cylinder(h=faceDepth + epsilon, d=screwDiameter + 1, center=true);
 }
 
 module faceMain() {
     union () {
-        /*
-        translate([5, -5, 0])
+        // Screw holes
+        translate([10, -25, 0])
             screwColumn();
-        translate([-10, 50, 0])
+        translate([-10, -25, 0])
             screwColumn();
-        */
+        translate([-10, 66, 0])
+            screwColumn();
+        translate([10, 66, 0])
+            screwColumn();
         
         // Outside shell with step
         difference () {
@@ -166,47 +177,45 @@ module faceMain() {
 }
 
 module facePlate() {
-    union () {
-        // Fake eye
-        translate([IPD / 2, 0, 0]) {
-            /*difference() {
-                sphere(d=eyeDiameter, center=true);
-                translate([0, 0, -eyeDiameter / 2])
-                    cube([eyeDiameter, eyeDiameter, eyeDiameter], center = true);
-            }*/
-        }
-        
-        // Occipital
-        difference () {
-            union () {
-                translate([-IPD / 2, 0, 0.5])
-                    cylinder(h=thickness + 1, d=occipitalDiameterA, center=true);
-                translate([IPD / 2, 0, 1])
-                    cylinder(h=thickness + 2, d=occipitalDiameterB, center=true);
+    // Occipital
+    difference () {
+        union () {
+            translate([-IPD / 2, 0, 0.5])
+                cylinder(h=thickness + 1, d=occipitalDiameterA, center=true);
+            translate([IPD / 2, 0, 1])
+                cylinder(h=thickness + 2, d=occipitalDiameterB, center=true);
 
-                // Jaw
-                translate([0, jawDepth - jawOffset, 0]) {
-                    difference() {
-                        union () {
-                            roundedCube(jawWidth, jawDepth, thickness, 6);
-                            // cube([jawWidth, jawDepth, thickness], center=true);
-                        }
+            // Jaw
+            translate([0, jawDepth - jawOffset, 0]) {
+                difference() {
+                    union () {
+                        roundedCube(jawWidth, jawDepth, thickness, 6);
+                        // cube([jawWidth, jawDepth, thickness], center=true);
                     }
                 }
             }
-
-            union () {
-                translate([IPD / 2, 0, 4])
-                    cylinder(h=thickness + epsilon, d=10, center=true);
-                
-                translate([-IPD / 2, 0, 0])
-                    cylinder(h=thickness * 10 + epsilon, d=ORB_D, center=true);
-                
-                translate([0, 55, thickness / 2])
-                    roundedCube(20, 10, thickness + epsilon, 6);
-            }
         }
-        
+
+        union () {
+            // Screw holes
+            translate([10, -25, 0])
+                screwHole();
+            translate([-10, -25, 0])
+                screwHole();
+            translate([-10, 66, 0])
+                screwHole();
+            translate([10, 66, 0])
+                screwHole();
+
+            translate([IPD / 2, 0, 4])
+                cylinder(h=thickness + epsilon, d=10, center=true);
+            
+            translate([-IPD / 2, 0, 0])
+                cylinder(h=thickness * 10 + epsilon, d=ORB_D, center=true);
+            
+            translate([0, 55, thickness / 2])
+                roundedCube(20, 10, thickness + epsilon, 6);
+        }
     }
 }
 
