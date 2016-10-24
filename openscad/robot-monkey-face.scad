@@ -81,11 +81,7 @@ module faceMain() {
         // Screw holes
         translate([10, -25, 0])
             screwColumn();
-        translate([-10, -25, 0])
-            screwColumn();
         translate([-10, 66, 0])
-            screwColumn();
-        translate([10, 66, 0])
             screwColumn();
         
         // Outside shell with step
@@ -201,11 +197,7 @@ module facePlate() {
             // Screw holes
             translate([10, -25, 0])
                 screwHole();
-            translate([-10, -25, 0])
-                screwHole();
             translate([-10, 66, 0])
-                screwHole();
-            translate([10, 66, 0])
                 screwHole();
 
             translate([IPD / 2, 0, 4])
