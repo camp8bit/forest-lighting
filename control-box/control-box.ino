@@ -7,7 +7,7 @@
 #define PIR_PIN     5
 
 #define BRIGHTNESS  255
-#define FRAMES_PER_SECOND 60
+#define FRAMES_PER_SECOND 120
 
 bool gReverseDirection = false;
 
@@ -43,13 +43,14 @@ void setup() {
   //   gPal = CRGBPalette16( CRGB::Black, CRGB::Red, CRGB::Yellow, CRGB::White);
 
   // Second, this palette is like the heat colors, but blue/aqua instead of red/yellow
-  // gPal = CRGBPalette16( CRGB::Black, CRGB::Blue, CRGB::Aqua,  CRGB::White);
+  gPal = CRGBPalette16( CRGB::Black, CRGB::Blue, CRGB::Aqua,  CRGB::White);
 
-  gPal = CRGBPalette16( CRGB::Black, CRGB::DarkBlue, CRGB::Purple,  CRGB::White);
+  // gPal = CRGBPalette16( CRGB::Black, CRGB::Red, CRGB::Pink,  CRGB::White);
 
   // Third, here's a simpler, three-step gradient, from black to red to white
   //   gPal = CRGBPalette16( CRGB::Black, CRGB::Red, CRGB::White);
 
+  SetupExplosions();
 }
 
 // ms of fade up
@@ -115,22 +116,80 @@ void loop()
 
   byte bF = max(0, min(255, fade));
 
-  Fire2012WithPalette(bF); // run simulation frame, using palette colors
+  DrawExplosions(bF);
+  // Fire2012WithPalette(bF); // run simulation frame, using palette colors
 
   FastLED.show(); // display this frame
   FastLED.delay(1000 / FRAMES_PER_SECOND);
 }
 
-// COOLING: How much does the air cool as it rises?
-// Less cooling = taller flames.  More cooling = shorter flames.
-// Default 55, suggested range 20-100
-#define COOLING  65
+struct explosion {
+  bool active;
+  int position;
+  int size;
+  CRGB color;
+};
 
-// SPARKING: What chance (out of 255) is there that a new spark will be lit?
-// Higher chance = more roaring fire.  Lower chance = more flickery fire.
-// Default 120, suggested range 50-200.
+#define NUM_EXPLOSIONS 10
+explosion explosions[NUM_EXPLOSIONS];
+
+void SetupExplosions()
+{
+  for (int i=0; i < NUM_EXPLOSIONS; i++){
+    explosions[i].active = false;
+  }
+}
+
+#define SPAWN_EXPLOSION 5
+#define EXPLOSION_SIZE 30
+
+void DrawExplosions(byte fade)
+{
+  int i;
+  int x;
+  
+  if (random(100) < SPAWN_EXPLOSION) {
+    int i = random(NUM_EXPLOSIONS - 1);
+    explosions[i].active = true;
+    explosions[i].size = 0;
+    explosions[i].position = random(NUM_LEDS);
+    explosions[i].color = (random(2) < 1) ? CRGB::Green : CRGB::Aqua;
+  }
+
+  for (i = 0; i < NUM_LEDS; i++) {
+    leds[i].fadeToBlackBy(16);
+  }
+  
+  for (i=0; i < NUM_EXPLOSIONS; i++){
+    if (!explosions[i].active) {
+      continue;
+    }
+
+    explosions[i].size++;
+
+    if (explosions[i].size > EXPLOSION_SIZE) {
+      explosions[i].active = false;
+      continue;
+    }
+    
+    for (x = -explosions[i].size / 2; x < explosions[i].size / 2; x++) {
+      int y = explosions[i].position + x;
+      
+      if (y < 0 || y >= NUM_LEDS) {
+        continue;
+      }
+
+      // use 240 instead of 255 to only use part of the palette
+      byte modulus = (int) 240 - (240 * abs(x) / (explosions[i].size / 2));
+      CRGB color = ColorFromPalette(gPal, modulus);
+      leds[y] = color; // explosions[i].color % modulus;
+      // leds[x] %= fade;
+    }
+  }
+}
+
+#define COOLING  80
 #define SPARKING 120
-
 
 void Fire2012WithPalette(byte fade)
 {
