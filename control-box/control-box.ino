@@ -116,12 +116,67 @@ void loop()
 
   byte bF = max(0, min(255, fade));
 
-  DrawExplosions(bF);
+  DrawNoise(bF);
+  // DrawPlasmaDirectional(bF);
+  // DrawPlasmaTwo(bF);
+  // DrawPlasma(bF);
+  // DrawExplosions(bF);
   // Fire2012WithPalette(bF); // run simulation frame, using palette colors
 
   FastLED.show(); // display this frame
   FastLED.delay(1000 / FRAMES_PER_SECOND);
 }
+
+/* Noise */
+void DrawNoise (byte fade) {
+  for (int i = 0; i < NUM_LEDS; i++) {
+    byte c = random(3) == 0 ? random(255) : CRGB::Black;
+    byte colorindex = scale8( c, 240);
+    CRGB color = ColorFromPalette( gPal, colorindex);
+    leds[i] = color;
+    leds[i] %= fade;
+  }
+}
+
+/* Draw a plasma that moves up and down*/
+void DrawPlasmaDirectional (byte fade) {
+  for (int i = 0; i < NUM_LEDS; i++) {
+    long t = sin8((long) millis() / 17) * 2;
+    t += sin8((long) millis() / 11) * 2;
+    byte c = sin8((long) i * 22 + t);
+    byte colorindex = scale8( c, 240);
+    CRGB color = ColorFromPalette( gPal, colorindex);
+    leds[i] = color;
+    leds[i] %= fade;
+  }
+}
+
+
+/* Draw a two factor plasma */
+void DrawPlasmaTwo (byte fade) {
+  for (int i = 0; i < NUM_LEDS; i++) {
+    byte c = sin8((long) i * 31 - millis() / 3);
+    byte b = sin8((long) i * 23 - millis() / 5);
+    byte colorindex = scale8((b / 2 + c / 2), 240);
+    CRGB color = ColorFromPalette( gPal, colorindex);
+    leds[i] = color;
+    leds[i] %= fade;
+  }
+}
+
+/* Draw a sin wave (single factor plasma) that moves up the strip */
+void DrawPlasma (byte fade) {
+  for (int i = 0; i < NUM_LEDS; i++) {
+    byte c = sin8((long) i * 30 - millis() / 2);
+    byte colorindex = scale8( c, 240);
+    CRGB color = ColorFromPalette( gPal, colorindex);
+    leds[i] = color;
+    leds[i] %= fade;
+  }
+}
+
+
+/* Draws explosions that extend out from a start point and then fade out */
 
 struct explosion {
   bool active;
@@ -183,7 +238,7 @@ void DrawExplosions(byte fade)
       byte modulus = (int) 240 - (240 * abs(x) / (explosions[i].size / 2));
       CRGB color = ColorFromPalette(gPal, modulus);
       leds[y] = color; // explosions[i].color % modulus;
-      // leds[x] %= fade;
+      leds[x] %= fade;
     }
   }
 }
