@@ -43,7 +43,9 @@ void setup() {
   //   gPal = CRGBPalette16( CRGB::Black, CRGB::Red, CRGB::Yellow, CRGB::White);
 
   // Second, this palette is like the heat colors, but blue/aqua instead of red/yellow
-  gPal = CRGBPalette16( CRGB::Black, CRGB::Blue, CRGB::Aqua,  CRGB::White);
+  // gPal = CRGBPalette16( CRGB::Black, CRGB::Blue, CRGB::Aqua,  CRGB::White);
+  // gPal = CRGBPalette16( CRGB::Black, CRGB::FireBrick, CRGB::DeepPink,  CRGB::White);
+  gPal = CRGBPalette16( CRGB::Black, CRGB(0,0,255), CRGB::White);
 
   // gPal = CRGBPalette16( CRGB::Black, CRGB::Red, CRGB::Pink,  CRGB::White);
 
@@ -116,9 +118,9 @@ void loop()
 
   byte bF = max(0, min(255, fade));
 
-  DrawNoise(bF);
+  // DrawNoise(bF);
   // DrawPlasmaDirectional(bF);
-  // DrawPlasmaTwo(bF);
+  DrawPlasmaTwo(bF);
   // DrawPlasma(bF);
   // DrawExplosions(bF);
   // Fire2012WithPalette(bF); // run simulation frame, using palette colors
@@ -131,7 +133,7 @@ void loop()
 void DrawNoise (byte fade) {
   for (int i = 0; i < NUM_LEDS; i++) {
     byte c = random(3) == 0 ? random(255) : CRGB::Black;
-    byte colorindex = scale8( c, 240);
+    byte colorindex = scale8( c, 200);
     CRGB color = ColorFromPalette( gPal, colorindex);
     leds[i] = color;
     leds[i] %= fade;
@@ -144,7 +146,7 @@ void DrawPlasmaDirectional (byte fade) {
     long t = sin8((long) millis() / 17) * 2;
     t += sin8((long) millis() / 11) * 2;
     byte c = sin8((long) i * 22 + t);
-    byte colorindex = scale8( c, 240);
+    byte colorindex = scale8( c, 200);
     CRGB color = ColorFromPalette( gPal, colorindex);
     leds[i] = color;
     leds[i] %= fade;
@@ -157,7 +159,7 @@ void DrawPlasmaTwo (byte fade) {
   for (int i = 0; i < NUM_LEDS; i++) {
     byte c = sin8((long) i * 31 - millis() / 3);
     byte b = sin8((long) i * 23 - millis() / 5);
-    byte colorindex = scale8((b / 2 + c / 2), 240);
+    byte colorindex = scale8((b / 2 + c / 2), 200);
     CRGB color = ColorFromPalette( gPal, colorindex);
     leds[i] = color;
     leds[i] %= fade;
@@ -168,7 +170,7 @@ void DrawPlasmaTwo (byte fade) {
 void DrawPlasma (byte fade) {
   for (int i = 0; i < NUM_LEDS; i++) {
     byte c = sin8((long) i * 30 - millis() / 2);
-    byte colorindex = scale8( c, 240);
+    byte colorindex = scale8( c, 200);
     CRGB color = ColorFromPalette( gPal, colorindex);
     leds[i] = color;
     leds[i] %= fade;
