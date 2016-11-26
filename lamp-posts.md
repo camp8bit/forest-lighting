@@ -1,6 +1,6 @@
 # Lamp posts
 
-Lamp posts with 1 meter of ws2812b with a PIR sensor and powered by a 12 volt battery.
+Lamp posts with 1.5 meter of ws2812b with a PIR sensor and powered by a 12 volt battery.
 
 ## Parts list
 
