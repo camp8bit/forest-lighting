@@ -28,6 +28,8 @@ void setup() {
   FastLED.addLeds<CHIPSET, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection( TypicalLEDStrip );
   FastLED.setBrightness( BRIGHTNESS );
 
+ FastLED.setMaxPowerInVoltsAndMilliamps(5, 600);
+
   pinMode(PIR_PIN, INPUT);
 
   lastTriggered = millis();
@@ -45,8 +47,8 @@ void setup() {
   // Second, this palette is like the heat colors, but blue/aqua instead of red/yellow
   // gPal = CRGBPalette16( CRGB::Black, CRGB::Blue, CRGB::Aqua,  CRGB::White);
   // gPal = CRGBPalette16( CRGB::Black, CRGB::FireBrick, CRGB::DeepPink,  CRGB::White);
-  gPal = CRGBPalette16( CRGB::Black, CRGB(0,0,255), CRGB::White);
-
+  // gPal = CRGBPalette16( CRGB::Black, CRGB(0,0,255), CRGB::White);
+  gPal = CRGBPalette16( CRGB::Black, CRGB::ForestGreen, CRGB::Yellow,  CRGB::White);
   // gPal = CRGBPalette16( CRGB::Black, CRGB::Red, CRGB::Pink,  CRGB::White);
 
   // Third, here's a simpler, three-step gradient, from black to red to white
@@ -120,11 +122,21 @@ void loop()
 
   // DrawNoise(bF);
   // DrawPlasmaDirectional(bF);
-  DrawPlasmaTwo(bF);
+  DrawPlasmaTwo();
   // DrawPlasma(bF);
   // DrawExplosions(bF);
   // Fire2012WithPalette(bF); // run simulation frame, using palette colors
 
+  int i;
+
+  for (i = 0; i < NUM_LEDS; i++) {
+    leds[i] %= bF;
+  }
+  
+  for (i = 0; i < NUM_LEDS - 30; i++) {
+    leds[i] = CRGB::Black;
+  }
+  
   FastLED.show(); // display this frame
   FastLED.delay(1000 / FRAMES_PER_SECOND);
 }
@@ -155,14 +167,13 @@ void DrawPlasmaDirectional (byte fade) {
 
 
 /* Draw a two factor plasma */
-void DrawPlasmaTwo (byte fade) {
+void DrawPlasmaTwo () {
   for (int i = 0; i < NUM_LEDS; i++) {
     byte c = sin8((long) i * 31 - millis() / 3);
     byte b = sin8((long) i * 23 - millis() / 5);
     byte colorindex = scale8((b / 2 + c / 2), 200);
     CRGB color = ColorFromPalette( gPal, colorindex);
     leds[i] = color;
-    leds[i] %= fade;
   }
 }
 
