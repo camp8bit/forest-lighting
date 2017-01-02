@@ -8,6 +8,10 @@
 
 #define BRIGHTNESS  255
 #define FRAMES_PER_SECOND 120
+#define STRIPE_WIDTH 30
+
+#define BREATHS_PER_MINUTE 15
+#define HEARTBEAT 70
 
 bool gReverseDirection = false;
 
@@ -46,9 +50,9 @@ void setup() {
 
   // Second, this palette is like the heat colors, but blue/aqua instead of red/yellow
   // gPal = CRGBPalette16( CRGB::Black, CRGB::Blue, CRGB::Aqua,  CRGB::White);
-  // gPal = CRGBPalette16( CRGB::Black, CRGB::FireBrick, CRGB::DeepPink,  CRGB::White);
+  gPal = CRGBPalette16( CRGB::Black, CRGB::FireBrick, CRGB::DeepPink,  CRGB::White);
   // gPal = CRGBPalette16( CRGB::Black, CRGB(0,0,255), CRGB::White);
-  gPal = CRGBPalette16( CRGB::Black, CRGB::ForestGreen, CRGB::Yellow,  CRGB::White);
+  // gPal = CRGBPalette16( CRGB::Black, CRGB::ForestGreen, CRGB::Yellow,  CRGB::White);
   // gPal = CRGBPalette16( CRGB::Black, CRGB::Red, CRGB::Pink,  CRGB::White);
 
   // Third, here's a simpler, three-step gradient, from black to red to white
@@ -127,14 +131,25 @@ void loop()
   // DrawExplosions(bF);
   // Fire2012WithPalette(bF); // run simulation frame, using palette colors
 
+  int offset = triwave8(beat8(BREATHS_PER_MINUTE)) * (NUM_LEDS - STRIPE_WIDTH) / 256;
   int i;
-
+  
   for (i = 0; i < NUM_LEDS; i++) {
     leds[i] %= bF;
   }
   
-  for (i = 0; i < NUM_LEDS - 30; i++) {
+  for (i = 0; i < offset; i++) {
     leds[i] = CRGB::Black;
+  }
+  
+  for (i = offset + STRIPE_WIDTH; i < NUM_LEDS; i++) {
+    leds[i] = CRGB::Black;
+  }
+
+  if (bF < 64) {
+    for (i = 0; i < 2; i++) {
+      leds[random(NUM_LEDS)] = ColorFromPalette( gPal, random(192));
+    }
   }
   
   FastLED.show(); // display this frame
