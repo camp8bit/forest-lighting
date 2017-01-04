@@ -25,6 +25,16 @@ unsigned long lastTriggered;
 // First trigger of sequence
 unsigned long firstTriggered;
 
+#include "Twinkle.h"
+#include "PlasmaTwo.h"
+
+// Configure the patterns available
+Pattern *wakePatterns = { new PlasmaTwo() };
+Pattern *sleepPatterns = { new Twinkle() };
+
+byte curWakePattern = 0;
+byte curSleepPattern = 0;
+
 void setup() {
   Serial.begin(9600);
 
@@ -32,7 +42,7 @@ void setup() {
   FastLED.addLeds<CHIPSET, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection( TypicalLEDStrip );
   FastLED.setBrightness( BRIGHTNESS );
 
- FastLED.setMaxPowerInVoltsAndMilliamps(5, 600);
+  FastLED.setMaxPowerInVoltsAndMilliamps(5, 600);
 
   pinMode(PIR_PIN, INPUT);
 
@@ -58,7 +68,8 @@ void setup() {
   // Third, here's a simpler, three-step gradient, from black to red to white
   //   gPal = CRGBPalette16( CRGB::Black, CRGB::Red, CRGB::White);
 
-  SetupExplosions();
+  wakePatterns[curWakePattern].setup(leds);
+  sleepPatterns[curWakePattern].setup(leds);
 }
 
 // ms of fade up
@@ -124,34 +135,11 @@ void loop()
 
   byte bF = max(0, min(255, fade));
 
-  // DrawNoise(bF);
-  // DrawPlasmaDirectional(bF);
-  DrawPlasmaTwo();
-  // DrawPlasma(bF);
-  // DrawExplosions(bF);
-  // Fire2012WithPalette(bF); // run simulation frame, using palette colors
-
-  int offset = triwave8(beat8(BREATHS_PER_MINUTE)) * (NUM_LEDS - STRIPE_WIDTH) / 256;
-  int i;
-  
-  for (i = 0; i < NUM_LEDS; i++) {
-    leds[i] %= bF;
-  }
-  
-  for (i = 0; i < offset; i++) {
-    leds[i] = CRGB::Black;
-  }
-  
-  for (i = offset + STRIPE_WIDTH; i < NUM_LEDS; i++) {
-    leds[i] = CRGB::Black;
-  }
-
+  wakePatterns[curWakePattern].loop(leds, bF);
   if (bF < 64) {
-    for (i = 0; i < 2; i++) {
-      leds[random(NUM_LEDS)] = ColorFromPalette( gPal, random(192));
-    }
+    sleepPatterns[curWakePattern].loop(leds, bF);
   }
-  
+
   FastLED.show(); // display this frame
   FastLED.delay(1000 / FRAMES_PER_SECOND);
 }
@@ -177,18 +165,6 @@ void DrawPlasmaDirectional (byte fade) {
     CRGB color = ColorFromPalette( gPal, colorindex);
     leds[i] = color;
     leds[i] %= fade;
-  }
-}
-
-
-/* Draw a two factor plasma */
-void DrawPlasmaTwo () {
-  for (int i = 0; i < NUM_LEDS; i++) {
-    byte c = sin8((long) i * 31 - millis() / 3);
-    byte b = sin8((long) i * 23 - millis() / 5);
-    byte colorindex = scale8((b / 2 + c / 2), 200);
-    CRGB color = ColorFromPalette( gPal, colorindex);
-    leds[i] = color;
   }
 }
 
