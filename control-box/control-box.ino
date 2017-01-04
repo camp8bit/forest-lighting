@@ -17,7 +17,12 @@
 
 bool gReverseDirection = false;
 
+// The actual LEDs sent to the neopixel
 CRGB leds[NUM_LEDS];
+
+// Activation values that can be used as an intermediary
+byte gActivation[NUM_LEDS];
+
 
 CRGBPalette16 gPal;
 
@@ -152,7 +157,9 @@ void loop()
 
   byte bF = max(0, min(255, fade));
 
-  wakePatterns[curWakePattern]->loop(leds, bF);
+  if (bF > 0) {
+    wakePatterns[curWakePattern]->loop(leds, bF);
+  }
   if (bF < 64) {
     sleepPatterns[curSleepPattern]->loop(leds, bF);
   }
