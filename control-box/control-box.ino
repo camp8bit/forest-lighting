@@ -13,6 +13,8 @@
 #define BREATHS_PER_MINUTE 15
 #define HEARTBEAT 70
 
+#define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
+
 bool gReverseDirection = false;
 
 CRGB leds[NUM_LEDS];
@@ -26,17 +28,26 @@ unsigned long lastTriggered;
 unsigned long firstTriggered;
 
 #include "Twinkle.h"
+
+#include "Plasma.h"
 #include "PlasmaTwo.h"
+#include "PlasmaDirectional.h"
+#include "Fire2012.h"
+#include "Explosions.h"
+#include "Noise.h"
 
 // Configure the patterns available
-Pattern *wakePatterns = { new PlasmaTwo() };
-Pattern *sleepPatterns = { new Twinkle() };
+Pattern *wakePatterns[] = { new Explosions(), new Fire2012(), new Plasma(), new PlasmaTwo(), new PlasmaDirectional(), new Noise() };
+Pattern *sleepPatterns[] = { new Twinkle() };
 
 byte curWakePattern = 0;
 byte curSleepPattern = 0;
 
 void setup() {
   Serial.begin(9600);
+  Serial.println("control-box 2017 - by camp8bit");
+  Serial.print("compiled on ");
+  Serial.println(__DATE__);
 
   delay(500); // sanity delay
   FastLED.addLeds<CHIPSET, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection( TypicalLEDStrip );
@@ -68,8 +79,8 @@ void setup() {
   // Third, here's a simpler, three-step gradient, from black to red to white
   //   gPal = CRGBPalette16( CRGB::Black, CRGB::Red, CRGB::White);
 
-  wakePatterns[curWakePattern].setup(leds);
-  sleepPatterns[curWakePattern].setup(leds);
+  wakePatterns[curWakePattern]->setup(leds);
+  sleepPatterns[curSleepPattern]->setup(leds);
 }
 
 // ms of fade up
@@ -95,7 +106,7 @@ void loop()
 
   // Fading
   //
-  // This section handles fading the animation in and out depending on when the
+  // This section handles fading the Pattern in and out depending on when the
   // motion sensor was first triggered, and most recently triggered. We have the
   // motion sensors set for minimum cycle time, so they have a period of about
   // 1-2 seconds. We fade the lights up when someone enters the scene, then keep
@@ -129,164 +140,49 @@ void loop()
   } else if (t - lastTriggered < MIN_PERIOD + FADE_DOWN) {
     dt = t - lastTriggered - MIN_PERIOD;
     fade = 255.0 - (255.0 / FADE_DOWN * dt);
+
+    // Cycle to the next Pattern
+    // To do: make this more robust
+    if(fade < 2) nextWakePattern();
+
   } else {
+
     fade = 0;
   }
 
   byte bF = max(0, min(255, fade));
 
-  wakePatterns[curWakePattern].loop(leds, bF);
+  wakePatterns[curWakePattern]->loop(leds, bF);
   if (bF < 64) {
-    sleepPatterns[curWakePattern].loop(leds, bF);
+    sleepPatterns[curSleepPattern]->loop(leds, bF);
   }
 
   FastLED.show(); // display this frame
   FastLED.delay(1000 / FRAMES_PER_SECOND);
 }
 
-/* Noise */
-void DrawNoise (byte fade) {
-  for (int i = 0; i < NUM_LEDS; i++) {
-    byte c = random(3) == 0 ? random(255) : CRGB::Black;
-    byte colorindex = scale8( c, 200);
-    CRGB color = ColorFromPalette( gPal, colorindex);
-    leds[i] = color;
-    leds[i] %= fade;
-  }
-}
-
-/* Draw a plasma that moves up and down*/
-void DrawPlasmaDirectional (byte fade) {
-  for (int i = 0; i < NUM_LEDS; i++) {
-    long t = sin8((long) millis() / 17) * 2;
-    t += sin8((long) millis() / 11) * 2;
-    byte c = sin8((long) i * 22 + t);
-    byte colorindex = scale8( c, 200);
-    CRGB color = ColorFromPalette( gPal, colorindex);
-    leds[i] = color;
-    leds[i] %= fade;
-  }
-}
-
-/* Draw a sin wave (single factor plasma) that moves up the strip */
-void DrawPlasma (byte fade) {
-  for (int i = 0; i < NUM_LEDS; i++) {
-    byte c = sin8((long) i * 30 - millis() / 2);
-    byte colorindex = scale8( c, 200);
-    CRGB color = ColorFromPalette( gPal, colorindex);
-    leds[i] = color;
-    leds[i] %= fade;
-  }
-}
-
-
-/* Draws explosions that extend out from a start point and then fade out */
-
-struct explosion {
-  bool active;
-  int position;
-  int size;
-  CRGB color;
-};
-
-#define NUM_EXPLOSIONS 10
-explosion explosions[NUM_EXPLOSIONS];
-
-void SetupExplosions()
+/**
+ * Skip to the next awake Pattern
+ */
+void nextWakePattern()
 {
-  for (int i=0; i < NUM_EXPLOSIONS; i++){
-    explosions[i].active = false;
-  }
+  curWakePattern = (curWakePattern + 1) % ARRAY_SIZE(wakePatterns);  
+
+  Serial.print("nextWakePattern: ");
+  Serial.print(curWakePattern);
+  Serial.print(" / ");
+  Serial.println(ARRAY_SIZE(wakePatterns));
+
+  wakePatterns[curWakePattern]->setup(leds);
 }
 
-#define SPAWN_EXPLOSION 5
-#define EXPLOSION_SIZE 30
-
-void DrawExplosions(byte fade)
+/**
+ * Skip to the next awake Pattern
+ */
+void nextSleepPattern()
 {
-  int i;
-  int x;
-  
-  if (random(100) < SPAWN_EXPLOSION) {
-    int i = random(NUM_EXPLOSIONS - 1);
-    explosions[i].active = true;
-    explosions[i].size = 0;
-    explosions[i].position = random(NUM_LEDS);
-    explosions[i].color = (random(2) < 1) ? CRGB::Green : CRGB::Aqua;
-  }
-
-  for (i = 0; i < NUM_LEDS; i++) {
-    leds[i].fadeToBlackBy(16);
-  }
-  
-  for (i=0; i < NUM_EXPLOSIONS; i++){
-    if (!explosions[i].active) {
-      continue;
-    }
-
-    explosions[i].size++;
-
-    if (explosions[i].size > EXPLOSION_SIZE) {
-      explosions[i].active = false;
-      continue;
-    }
-    
-    for (x = -explosions[i].size / 2; x < explosions[i].size / 2; x++) {
-      int y = explosions[i].position + x;
-      
-      if (y < 0 || y >= NUM_LEDS) {
-        continue;
-      }
-
-      // use 240 instead of 255 to only use part of the palette
-      byte modulus = (int) 240 - (240 * abs(x) / (explosions[i].size / 2));
-      CRGB color = ColorFromPalette(gPal, modulus);
-      leds[y] = color; // explosions[i].color % modulus;
-      leds[x] %= fade;
-    }
-  }
+  curSleepPattern = (curSleepPattern + 1) % ARRAY_SIZE(sleepPatterns);  
+  sleepPatterns[curSleepPattern]->setup(leds);
 }
 
-#define COOLING  80
-#define SPARKING 120
-
-void Fire2012WithPalette(byte fade)
-{
-  // Array of temperature readings at each simulation cell
-  static byte heat[NUM_LEDS];
-
-  bool pirOn = digitalRead(PIR_PIN) == HIGH;
-
-  // Step 1.  Cool down every cell a little
-  for ( int i = 0; i < NUM_LEDS; i++) {
-    heat[i] = qsub8( heat[i],  random8(0, ((COOLING * 10) / NUM_LEDS) + 2));
-  }
-
-  // Step 2.  Heat from each cell drifts 'up' and diffuses a little
-  for ( int k = NUM_LEDS - 1; k >= 2; k--) {
-    heat[k] = (heat[k - 1] + heat[k - 2] + heat[k - 2] ) / 3;
-  }
-
-  // Step 3.  Randomly ignite new 'sparks' of heat near the bottom
-  if ( random8() < SPARKING ) {
-    int y = random8(7);
-    heat[y] = qadd8( heat[y], random8(160, 255) );
-  }
-
-  // Step 4.  Map from heat cells to LED colors
-  for ( int j = 0; j < NUM_LEDS; j++) {
-    // Scale the heat value from 0-255 down to 0-240
-    // for best results with color palettes.
-    byte colorindex = scale8( heat[j], 240);
-    CRGB color = ColorFromPalette( gPal, colorindex);
-    int pixelnumber;
-    if ( gReverseDirection ) {
-      pixelnumber = (NUM_LEDS - 1) - j;
-    } else {
-      pixelnumber = j;
-    }
-    leds[pixelnumber] = color;
-    leds[pixelnumber] %= fade;
-  }
-}
 
