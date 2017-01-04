@@ -13,8 +13,7 @@ class PlasmaDirectional: public Pattern {
         byte c = sin8((long) i * 22 + t);
         byte colorindex = scale8( c, 200);
         CRGB color = ColorFromPalette( gPal, colorindex);
-        leds[i] = color;
-        leds[i] %= fade;
+        leds[i] = blend(CRGB::Black, color, fade);
       }
     }
 };

@@ -11,8 +11,7 @@ class Plasma: public Pattern {
         byte c = sin8((long) i * 30 - millis() / 2);
         byte colorindex = scale8( c, 200);
         CRGB color = ColorFromPalette( gPal, colorindex);
-        leds[i] = color;
-        leds[i] %= fade;
+        blend(CRGB::Black, color, fade);
       }
     }
 };

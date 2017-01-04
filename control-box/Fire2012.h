@@ -43,8 +43,7 @@ class Fire2012: public Pattern {
         } else {
           pixelnumber = j;
         }
-        leds[pixelnumber] = color;
-        leds[pixelnumber] %= fade;
+        leds[pixelnumber] = blend(CRGB::Black, color, fade);
       }
     }
 };

@@ -15,15 +15,11 @@ class PlasmaTwo: public Pattern {
         byte b = sin8((long) i * 23 - millis() / 5);
         byte colorindex = scale8((b / 2 + c / 2), 200);
         CRGB color = ColorFromPalette(gPal, colorindex);
-        leds[i] = color;
+        leds[i] = blend(CRGB::Black, color, fade);
       }
 
       // Crop to a segment that oscillates up and down
       int offset = triwave8(beat8(BREATHS_PER_MINUTE)) * (NUM_LEDS - STRIPE_WIDTH) / 256;
-      
-      for (i = 0; i < NUM_LEDS; i++) {
-        leds[i] %= fade;
-      }
       
       for (i = 0; i < offset; i++) {
         leds[i] = CRGB::Black;

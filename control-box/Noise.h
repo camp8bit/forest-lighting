@@ -11,8 +11,7 @@ class Noise: public Pattern {
         byte c = random(3) == 0 ? random(255) : CRGB::Black;
         byte colorindex = scale8( c, 200);
         CRGB color = ColorFromPalette( gPal, colorindex);
-        leds[i] = color;
-        //leds[i] %= fade;
+        leds[i] = blend(CRGB::Black, color, fade);
       }
     }
 };
