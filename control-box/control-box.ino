@@ -13,6 +13,12 @@
 #define BREATHS_PER_MINUTE 15
 #define HEARTBEAT 70
 
+// ms of fade up
+#define FADE_UP 2000
+#define MIN_PERIOD (FADE_UP + 2000)
+#define FADE_DOWN 2000
+
+
 #define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
 
 bool gReverseDirection = false;
@@ -32,14 +38,24 @@ unsigned long lastTriggered;
 // First trigger of sequence
 unsigned long firstTriggered;
 
-#include "Twinkle.h"
+#include "PinSensor.h"
+#include "ASRFader.h"
 
+#include "Twinkle.h"
 #include "Plasma.h"
 #include "PlasmaTwo.h"
 #include "PlasmaDirectional.h"
 #include "Fire2012.h"
 #include "Explosions.h"
 #include "Noise.h"
+
+// Fader control will fade the lights up when someone enters the scene, then keep
+// them faded up for a minimum period. If the PIR triggers again in this time
+// we keep the lights up. The goal is to have smooth transitions when someone
+// walks up, and if people stand around under the lamp posts (and trigger the
+// PIR every few seconds), the lamp posts will stay  lit until the person
+// walks away for good.
+ASRFader fadeControl(new PinSensor(PIR_PIN), FADE_UP, MIN_PERIOD, FADE_DOWN);
 
 // Configure the patterns available
 Pattern *wakePatterns[] = { new Explosions(), new Fire2012(), new Plasma(), new PlasmaTwo(), new PlasmaDirectional(), new Noise() };
@@ -60,15 +76,8 @@ void setup() {
 
   FastLED.setMaxPowerInVoltsAndMilliamps(5, 600);
 
-  pinMode(PIR_PIN, INPUT);
-
-  lastTriggered = millis();
-
-  firstTriggered = millis();
-
   // This first palette is the basic 'black body radiation' colors,
   // which run from black to red to bright yellow to white.
-  gPal = HeatColors_p;
 
   // These are other ways to set up the color palette for the 'fire'.
   // First, a gradient from black to red to yellow to white -- similar to HeatColors_p
@@ -84,14 +93,14 @@ void setup() {
   // Third, here's a simpler, three-step gradient, from black to red to white
   //   gPal = CRGBPalette16( CRGB::Black, CRGB::Red, CRGB::White);
 
+  // Wire together components
+  fadeControl.onFadeOutEnd = &nextWakePattern;
+
+  // Set up components
+  fadeControl.setup();
   wakePatterns[curWakePattern]->setup(leds);
   sleepPatterns[curSleepPattern]->setup(leds);
 }
-
-// ms of fade up
-#define FADE_UP 2000
-#define MIN_PERIOD (FADE_UP + 2000)
-#define FADE_DOWN 2000
 
 void loop()
 {
@@ -109,53 +118,9 @@ void loop()
   //   CRGB lightcolor = CHSV(hue,128,255); // half 'whitened', full brightness
   //   gPal = CRGBPalette16( CRGB::Black, darkcolor, lightcolor, CRGB::White);
 
-  // Fading
-  //
-  // This section handles fading the Pattern in and out depending on when the
-  // motion sensor was first triggered, and most recently triggered. We have the
-  // motion sensors set for minimum cycle time, so they have a period of about
-  // 1-2 seconds. We fade the lights up when someone enters the scene, then keep
-  // them faded up for a minimum period. If the PIR triggers again in this time
-  // we keep the lights up. The goal is to have smooth transitions when someone
-  // walks up, and if people stand around under the lamp posts (and trigger the
-  // PIR every few seconds), the lamp posts will stay  lit until the person
-  // walks away for good.
-
-  if (digitalRead(PIR_PIN) == HIGH) {
-    if (millis() > lastTriggered + MIN_PERIOD + FADE_DOWN ) {
-      firstTriggered = millis();
-    }
-
-    lastTriggered = millis();
-  }
-
-  float fade = 0;
-
-  // Use longs for your time math or you'll have cool bugs you can't work out
-  long dt;
-  unsigned long t = millis();
-
-  if (t - firstTriggered <= FADE_UP) {
-    // fading up
-    dt = t - firstTriggered;
-    fade = 255.0 / FADE_UP * dt;
-  } else if (t - lastTriggered <= MIN_PERIOD) {
-    // staying up
-    fade = 255.0;
-  } else if (t - lastTriggered < MIN_PERIOD + FADE_DOWN) {
-    dt = t - lastTriggered - MIN_PERIOD;
-    fade = 255.0 - (255.0 / FADE_DOWN * dt);
-
-    // Cycle to the next Pattern
-    // To do: make this more robust
-    if(fade < 2) nextWakePattern();
-
-  } else {
-
-    fade = 0;
-  }
-
-  byte bF = max(0, min(255, fade));
+  fadeControl.loop();
+  
+  byte bF = fadeControl.fade();
 
   if (bF > 0) {
     wakePatterns[curWakePattern]->loop(leds, bF);
