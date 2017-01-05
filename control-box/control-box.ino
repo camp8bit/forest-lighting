@@ -29,7 +29,6 @@
   #define DEBUG_PRINT(msg) ()
 #endif
 
-#define ARRAY_SIZE(A) (sizeof(A) / sizeof((A)[0]))
 
 bool gReverseDirection = false;
 
@@ -50,6 +49,7 @@ unsigned long firstTriggered;
 #include "PinSensor.h"
 #include "ASRFader.h"
 
+#include "PatternList.h"
 #include "Twinkle.h"
 #include "Plasma.h"
 #include "PlasmaTwo.h"
@@ -67,11 +67,11 @@ unsigned long firstTriggered;
 ASRFader fadeControl(PIR_PIN, FADE_UP, MIN_PERIOD, FADE_DOWN);
 
 // Configure the patterns available
-Pattern *wakePatterns[] = { new Explosions(), new Fire2012(), new Plasma(), new PlasmaTwo(), new PlasmaDirectional(), new Noise() };
-Pattern *sleepPatterns[] = { new Twinkle() };
+Pattern *wakePatternItems[] = { new Explosions(), new Fire2012(), new Plasma(), new PlasmaTwo(), new PlasmaDirectional(), new Noise() };
+PatternList wakePatterns(6, wakePatternItems);
 
-byte curWakePattern = 0;
-byte curSleepPattern = 0;
+Pattern *sleepPatternItems[] = { new Twinkle() };
+PatternList sleepPatterns(1, sleepPatternItems);
 
 void setup() {
   Serial.begin(9600);
@@ -102,13 +102,14 @@ void setup() {
   // Third, here's a simpler, three-step gradient, from black to red to white
   //   gPal = CRGBPalette16( CRGB::Black, CRGB::Red, CRGB::White);
 
-  // Wire together components
-  fadeControl.onFadeOutEnd = &nextWakePattern; // ([]() { Serial.println("test"); });
+  // Wire together components - weird syntax is a closure
+  fadeControl.onFadeOutEnd = ([]() { wakePatterns.next(); });
+  fadeControl.onFadeInEnd = ([]() { sleepPatterns.next(); });
 
   // Set up components
   fadeControl.setup();
-  wakePatterns[curWakePattern]->setup(leds);
-  sleepPatterns[curSleepPattern]->setup(leds);
+  wakePatterns.setup(leds);
+  sleepPatterns.setup(leds);
 }
 
 void loop()
@@ -132,38 +133,12 @@ void loop()
   byte bF = fadeControl.fade();
 
   if (bF > 0) {
-    wakePatterns[curWakePattern]->loop(leds, bF);
+    wakePatterns.loop(leds, bF);
   }
   if (bF < 64) {
-    sleepPatterns[curSleepPattern]->loop(leds, bF);
+    sleepPatterns.loop(leds, 255-bF);
   }
 
   FastLED.show(); // display this frame
   FastLED.delay(1000 / FRAMES_PER_SECOND);
 }
-
-/**
- * Skip to the next awake Pattern
- */
-void nextWakePattern()
-{
-  curWakePattern = (curWakePattern + 1) % ARRAY_SIZE(wakePatterns);  
-
-  Serial.print("nextWakePattern: ");
-  Serial.print(curWakePattern);
-  Serial.print(" / ");
-  Serial.println(ARRAY_SIZE(wakePatterns));
-
-  wakePatterns[curWakePattern]->setup(leds);
-}
-
-/**
- * Skip to the next awake Pattern
- */
-void nextSleepPattern()
-{
-  curSleepPattern = (curSleepPattern + 1) % ARRAY_SIZE(sleepPatterns);  
-  sleepPatterns[curSleepPattern]->setup(leds);
-}
-
-

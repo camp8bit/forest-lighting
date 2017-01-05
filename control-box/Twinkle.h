@@ -38,7 +38,7 @@ class Twinkle: public Pattern {
           }
 
           // Re-draw pixel
-          leds[i] = ColorFromPalette(gPal, colorRef);
+          leds[i] = blend(CRGB::Black, ColorFromPalette(gPal, colorRef), fade);
         }
       }
 
