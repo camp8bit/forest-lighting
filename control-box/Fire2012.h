@@ -13,8 +13,6 @@ class Fire2012: public Pattern {
       // Array of temperature readings at each simulation cell
       static byte heat[NUM_LEDS];
     
-      bool pirOn = digitalRead(PIR_PIN) == HIGH;
-    
       // Step 1.  Cool down every cell a little
       for ( int i = 0; i < NUM_LEDS; i++) {
         heat[i] = qsub8( heat[i],  random8(0, ((COOLING * 10) / NUM_LEDS) + 2));
