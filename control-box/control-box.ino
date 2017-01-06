@@ -32,13 +32,7 @@
 
 bool gReverseDirection = false;
 
-// The actual LEDs sent to the neopixel
-CRGB leds[NUM_LEDS];
-
 // Activation values that can be used as an intermediary
-byte gActivation[NUM_LEDS];
-
-CRGBPalette16 gPal;
 
 // Last time sensor was triggered
 unsigned long lastTriggered;
@@ -49,7 +43,9 @@ unsigned long firstTriggered;
 #include "PinSensor.h"
 #include "ASRFader.h"
 
+#include "PatternState.h"
 #include "PatternList.h"
+
 #include "Twinkle.h"
 #include "Plasma.h"
 #include "PlasmaTwo.h"
@@ -73,6 +69,8 @@ PatternList wakePatterns(6, wakePatternItems);
 Pattern *sleepPatternItems[] = { new Twinkle() };
 PatternList sleepPatterns(1, sleepPatternItems);
 
+PatternState state;
+
 void setup() {
   Serial.begin(9600);
   Serial.println("control-box 2017 - by camp8bit");
@@ -80,7 +78,7 @@ void setup() {
   Serial.println(__DATE__);
 
   delay(500); // sanity delay
-  FastLED.addLeds<CHIPSET, LED_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection( TypicalLEDStrip );
+  FastLED.addLeds<CHIPSET, LED_PIN, COLOR_ORDER>(state.leds, NUM_LEDS).setCorrection( TypicalLEDStrip );
   FastLED.setBrightness( BRIGHTNESS );
 
   FastLED.setMaxPowerInVoltsAndMilliamps(5, 600);
@@ -90,26 +88,29 @@ void setup() {
 
   // These are other ways to set up the color palette for the 'fire'.
   // First, a gradient from black to red to yellow to white -- similar to HeatColors_p
-  //   gPal = CRGBPalette16( CRGB::Black, CRGB::Red, CRGB::Yellow, CRGB::White);
+  //   state->palette = CRGBPalette16( CRGB::Black, CRGB::Red, CRGB::Yellow, CRGB::White);
 
   // Second, this palette is like the heat colors, but blue/aqua instead of red/yellow
-  // gPal = CRGBPalette16( CRGB::Black, CRGB::Blue, CRGB::Aqua,  CRGB::White);
-  gPal = CRGBPalette16( CRGB::Black, CRGB(0,0,255), CRGB(0,255,255), CRGB::White);
-  // gPal = CRGBPalette16( CRGB::Black, CRGB(0,0,255), CRGB::White);
-  // gPal = CRGBPalette16( CRGB::Black, CRGB::ForestGreen, CRGB::Yellow,  CRGB::White);
-  // gPal = CRGBPalette16( CRGB::Black, CRGB::Red, CRGB::Pink,  CRGB::White);
+  // state->palette = CRGBPalette16( CRGB::Black, CRGB::Blue, CRGB::Aqua,  CRGB::White);
+  state.palette = CRGBPalette16( CRGB::Black, CRGB(0,0,255), CRGB(0,255,255), CRGB::White);
+  // state->palette = CRGBPalette16( CRGB::Black, CRGB(0,0,255), CRGB::White);
+  // state->palette = CRGBPalette16( CRGB::Black, CRGB::ForestGreen, CRGB::Yellow,  CRGB::White);
+  // state->palette = CRGBPalette16( CRGB::Black, CRGB::Red, CRGB::Pink,  CRGB::White);
 
   // Third, here's a simpler, three-step gradient, from black to red to white
-  //   gPal = CRGBPalette16( CRGB::Black, CRGB::Red, CRGB::White);
+  //   state->palette = CRGBPalette16( CRGB::Black, CRGB::Red, CRGB::White);
 
   // Wire together components - weird syntax is a closure
   fadeControl.onFadeOutEnd = ([]() { wakePatterns.next(); });
   fadeControl.onFadeInEnd = ([]() { sleepPatterns.next(); });
 
+  wakePatterns.setState(&state);
+  sleepPatterns.setState(&state);
+
   // Set up components
   fadeControl.setup();
-  wakePatterns.setup(leds);
-  sleepPatterns.setup(leds);
+  wakePatterns.setup();
+  sleepPatterns.setup();
 }
 
 void loop()
@@ -126,17 +127,17 @@ void loop()
   //   hue++;
   //   CRGB darkcolor  = CHSV(hue,255,192); // pure hue, three-quarters brightness
   //   CRGB lightcolor = CHSV(hue,128,255); // half 'whitened', full brightness
-  //   gPal = CRGBPalette16( CRGB::Black, darkcolor, lightcolor, CRGB::White);
+  //   state->palette = CRGBPalette16( CRGB::Black, darkcolor, lightcolor, CRGB::White);
 
   fadeControl.loop();
   
   byte bF = fadeControl.fade();
 
   if (bF > 0) {
-    wakePatterns.loop(leds, bF);
+    wakePatterns.loop(bF);
   }
   if (bF < 64) {
-    sleepPatterns.loop(leds, 255-bF);
+    sleepPatterns.loop(255-bF);
   }
 
   FastLED.show(); // display this frame

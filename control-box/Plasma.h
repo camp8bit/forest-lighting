@@ -5,12 +5,12 @@
  */
 class Plasma: public Pattern {
   public:
-    void loop(CRGB *leds, byte fade)
+    void loop(byte fade)
     {
       for (int i = 0; i < NUM_LEDS; i++) {
         byte c = sin8((long) i * 30 - millis() / 2);
-        byte colorindex = scale8( c, 200);
-        CRGB color = ColorFromPalette( gPal, colorindex);
+        byte colorindex = scale8(c, 200);
+        CRGB color = ColorFromPalette(_state->palette, colorindex);
         blend(CRGB::Black, color, fade);
       }
     }

@@ -13,12 +13,19 @@ class PatternList: public Pattern {
     PatternList(byte numPatterns, Pattern **patterns): _curPattern(0), _numPatterns(numPatterns), _patterns(patterns) {
     }
 
-    void setup(CRGB *leds) {
-      _patterns[_curPattern]->setup(leds);
+    void setup() {
+      _patterns[_curPattern]->setup();
     }
     
-    void loop(CRGB *leds, byte fade) {
-      _patterns[_curPattern]->loop(leds, fade);
+    void loop(byte fade) {
+      _patterns[_curPattern]->loop(fade);
+    }
+
+    void setState(PatternState *state)
+    {
+      for(byte i = 0; i < _numPatterns; i++) {
+        _patterns[i]->setState(state);
+      }
     }
 
     /**
@@ -26,6 +33,6 @@ class PatternList: public Pattern {
      */
     void next() {
       _curPattern = (_curPattern + 1) % _numPatterns;
-      setup(leds); // to do: remove reference to global
+      setup();
     }
 };
