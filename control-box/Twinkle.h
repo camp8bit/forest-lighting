@@ -13,7 +13,7 @@ class Twinkle: public Pattern {
         _state->activation[i] = 0;
       }
     }
-    
+
     void loop(byte fade)
     {
       int i;

@@ -20,7 +20,7 @@ class Pattern {
     virtual void setup()
     {
     }
-   
+
     /**
      * Run a single frame of the pattern
      * @param _state->leds The LED strip to draw to

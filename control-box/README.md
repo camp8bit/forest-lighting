@@ -29,7 +29,7 @@ class RandomPattern: public Pattern {
 There are two methods that you can override:
 
  * `setup()` This will be called whenever your pattern starts. (optional)
- * `loop(byte fade)` This will be called on ever frame when your pattern runs. `fade` is a 
+ * `loop(byte fade)` This will be called on ever frame when your pattern runs. `fade` is a
    variable that incidates how strongly activated your pattern is, for example, when fading
    a pattern in.
 
