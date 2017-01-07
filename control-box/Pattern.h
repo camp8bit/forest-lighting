@@ -34,7 +34,15 @@ class Pattern {
     virtual void setState(PatternState *state)
     {
       _state = state;
-    }
+    };
+
+    /**
+     * Get the LEDs array that this pattern outputs to;
+     */
+    CRGB *getLEDs()
+    {
+      return _state->leds;
+    };
 };
 
 #endif

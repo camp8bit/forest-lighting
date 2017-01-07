@@ -14,8 +14,7 @@ class PlasmaTwo: public Pattern {
         byte c = sin8((long) i * 31 - millis() / 3);
         byte b = sin8((long) i * 23 - millis() / 5);
         byte colorindex = scale8((b / 2 + c / 2), 200);
-        CRGB color = ColorFromPalette(_state->palette, colorindex);
-        _state->leds[i] = blend(CRGB::Black, color, fade);
+        _state->leds[i] = ColorFromPalette(_state->palette, colorindex);
       }
 
       // Crop to a segment that oscillates up and down

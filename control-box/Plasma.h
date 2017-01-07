@@ -10,8 +10,7 @@ class Plasma: public Pattern {
       for (int i = 0; i < NUM_LEDS; i++) {
         byte c = sin8((long) i * 30 - millis() / 2);
         byte colorindex = scale8(c, 200);
-        CRGB color = ColorFromPalette(_state->palette, colorindex);
-        blend(CRGB::Black, color, fade);
+        _state->leds[i] = ColorFromPalette(_state->palette, colorindex);
       }
     }
 };

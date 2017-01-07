@@ -14,9 +14,9 @@
 #define HEARTBEAT 70
 
 // ms of fade up
-#define FADE_UP 2000
-#define MIN_PERIOD (FADE_UP + 2000)
-#define FADE_DOWN 2000
+#define FADE_UP 5000
+#define MIN_PERIOD (FADE_UP + 15000)
+#define FADE_DOWN 10000
 
 #ifdef DEV_MODE
   #define NUM_LEDS    60
@@ -45,6 +45,7 @@ unsigned long firstTriggered;
 
 #include "PatternState.h"
 #include "PatternList.h"
+#include "CrossFader.h"
 
 #include "Twinkle.h"
 #include "Plasma.h"
@@ -62,6 +63,7 @@ unsigned long firstTriggered;
 // walks away for good.
 ASRFader fadeControl(PIR_PIN, FADE_UP, MIN_PERIOD, FADE_DOWN);
 
+
 // Configure the patterns available
 Pattern *wakePatternItems[] = { new Explosions(), new Fire2012(), new Plasma(), new PlasmaTwo(), new PlasmaDirectional(), new Noise() };
 PatternList wakePatterns(6, wakePatternItems);
@@ -69,7 +71,10 @@ PatternList wakePatterns(6, wakePatternItems);
 Pattern *sleepPatternItems[] = { new Twinkle() };
 PatternList sleepPatterns(1, sleepPatternItems);
 
-PatternState state;
+// Create a crossfader for blending between sleep and wake
+CrossFader crossfader(&sleepPatterns, &wakePatterns);
+
+PatternState state, sleepState, wakeState;
 
 void setup() {
   Serial.begin(9600);
@@ -92,7 +97,7 @@ void setup() {
 
   // Second, this palette is like the heat colors, but blue/aqua instead of red/yellow
   // state->palette = CRGBPalette16( CRGB::Black, CRGB::Blue, CRGB::Aqua,  CRGB::White);
-  state.palette = CRGBPalette16( CRGB::Black, CRGB(0,0,255), CRGB(0,255,255), CRGB::White);
+  sleepState.palette = wakeState.palette = CRGBPalette16( CRGB::Black, CRGB(0,0,255), CRGB(0,255,255), CRGB::White);
   // state->palette = CRGBPalette16( CRGB::Black, CRGB(0,0,255), CRGB::White);
   // state->palette = CRGBPalette16( CRGB::Black, CRGB::ForestGreen, CRGB::Yellow,  CRGB::White);
   // state->palette = CRGBPalette16( CRGB::Black, CRGB::Red, CRGB::Pink,  CRGB::White);
@@ -104,13 +109,13 @@ void setup() {
   fadeControl.onFadeOutEnd = ([]() { wakePatterns.next(); });
   fadeControl.onFadeInEnd = ([]() { sleepPatterns.next(); });
 
-  wakePatterns.setState(&state);
-  sleepPatterns.setState(&state);
+  wakePatterns.setState(&wakeState);
+  sleepPatterns.setState(&sleepState);
+  crossfader.setState(&state);
 
   // Set up components
   fadeControl.setup();
-  wakePatterns.setup();
-  sleepPatterns.setup();
+  crossfader.setup();
 }
 
 void loop()
@@ -130,15 +135,8 @@ void loop()
   //   state->palette = CRGBPalette16( CRGB::Black, darkcolor, lightcolor, CRGB::White);
 
   fadeControl.loop();
-  
-  byte bF = fadeControl.fade();
 
-  if (bF > 0) {
-    wakePatterns.loop(bF);
-  }
-  if (bF < 64) {
-    sleepPatterns.loop(255-bF);
-  }
+  crossfader.loop(fadeControl.fade());
 
   FastLED.show(); // display this frame
   FastLED.delay(1000 / FRAMES_PER_SECOND);

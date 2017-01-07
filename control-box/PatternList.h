@@ -1,4 +1,5 @@
 #include "Pattern.h"
+#include <FastLED.h>
 
 /**
  * Represents a list of patterns that you can switch between
@@ -23,6 +24,7 @@ class PatternList: public Pattern {
 
     void setState(PatternState *state)
     {
+      _state = state;
       for(byte i = 0; i < _numPatterns; i++) {
         _patterns[i]->setState(state);
       }

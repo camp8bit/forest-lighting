@@ -64,8 +64,7 @@ class Explosions: public Pattern {
 
           // use 240 instead of 255 to only use part of the palette
           byte modulus = (int) 240 - (240 * abs(x) / (_explosions[i].size / 2));
-          CRGB color = ColorFromPalette(_state->palette, modulus);
-          _state->leds[y] = blend(CRGB::Black, color, fade); // explosions[i].color % modulus;
+          _state->leds[y] = ColorFromPalette(_state->palette, modulus);
         }
       }
     }

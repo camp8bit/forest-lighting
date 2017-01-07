@@ -1,3 +1,5 @@
+#include <FastLED.h>
+
 #ifndef PatternState_h
 #define PatternState_h
 
@@ -5,7 +7,7 @@
  * Provides shared state between patterns.
  * State for a pattern can be memory intensive and with only 2KB of SRAM availble,
  * it's not practical to have separate state for each pattern.
- * 
+ *
  * Rather than use globals, we make use of a PatternState object.
  */
 class PatternState {
@@ -25,6 +27,13 @@ class PatternState {
      * A palette to for the patterns to use.
      */
     CRGBPalette16 palette;
+
+    PatternState() {
+      for(byte i = 0; i < NUM_LEDS; i++) {
+        leds[i] = CRGB::Black;
+        activation[i] = 0;
+      }
+    }
 
 };
 
