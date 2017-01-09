@@ -8,13 +8,14 @@ class PlasmaTwo: public Pattern {
     void loop(byte fade)
     {
       int i;
+      CRGBPalette16 *palette = _state->getPalette();
 
       // Plasma pattern
       for (i = 0; i < NUM_LEDS; i++) {
         byte c = sin8((long) i * 31 - millis() / 3);
         byte b = sin8((long) i * 23 - millis() / 5);
         byte colorindex = scale8((b / 2 + c / 2), 200);
-        _state->leds[i] = ColorFromPalette(_state->palette, colorindex);
+        _state->leds[i] = ColorFromPalette(*palette, colorindex);
       }
 
       // Crop to a segment that oscillates up and down

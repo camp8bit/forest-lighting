@@ -54,10 +54,19 @@
 // walks away for good.
 ASRFader fadeControl(PIR_PIN, FADE_UP, MIN_PERIOD, FADE_DOWN);
 
+// Configure palette
+CRGBPalette16 palette(CRGB::Black, CRGB(0,0,255), CRGB(0,255,255), CRGB::White);
+    // Other options:
+    // CRGBPalette16 palette( CRGB::Black, CRGB::Red, CRGB::Yellow, CRGB::White);
+    // CRGBPalette16 palette( CRGB::Black, CRGB::Blue, CRGB::Aqua,  CRGB::White);
+    // CRGBPalette16 palette( CRGB::Black, CRGB(0,0,255), CRGB::White);
+    // CRGBPalette16 palette( CRGB::Black, CRGB::ForestGreen, CRGB::Yellow,  CRGB::White);
+    // CRGBPalette16 palette( CRGB::Black, CRGB::Red, CRGB::Pink,  CRGB::White);
+    // CRGBPalette16 palette( CRGB::Black, CRGB::Red, CRGB::White);
 
 // Configure the patterns available
-Pattern *wakePatternItems[] = { new Explosions(), new Fire2012(), new Plasma(), new PlasmaTwo(), new PlasmaDirectional(), new Noise() };
-PatternList wakePatterns(6, wakePatternItems);
+Pattern *wakePatternItems[] = { new Explosions(), new Fire2012(), new PlasmaTwo(), new PlasmaDirectional() };
+PatternList wakePatterns(4, wakePatternItems);
 
 Pattern *sleepPatternItems[] = { new Twinkle() };
 PatternList sleepPatterns(1, sleepPatternItems);
@@ -79,26 +88,12 @@ void setup() {
 
   FastLED.setMaxPowerInVoltsAndMilliamps(5, 600);
 
-  // This first palette is the basic 'black body radiation' colors,
-  // which run from black to red to bright yellow to white.
-
-  // These are other ways to set up the color palette for the 'fire'.
-  // First, a gradient from black to red to yellow to white -- similar to HeatColors_p
-  //   state->palette = CRGBPalette16( CRGB::Black, CRGB::Red, CRGB::Yellow, CRGB::White);
-
-  // Second, this palette is like the heat colors, but blue/aqua instead of red/yellow
-  // state->palette = CRGBPalette16( CRGB::Black, CRGB::Blue, CRGB::Aqua,  CRGB::White);
-  sleepState.palette = wakeState.palette = CRGBPalette16( CRGB::Black, CRGB(0,0,255), CRGB(0,255,255), CRGB::White);
-  // state->palette = CRGBPalette16( CRGB::Black, CRGB(0,0,255), CRGB::White);
-  // state->palette = CRGBPalette16( CRGB::Black, CRGB::ForestGreen, CRGB::Yellow,  CRGB::White);
-  // state->palette = CRGBPalette16( CRGB::Black, CRGB::Red, CRGB::Pink,  CRGB::White);
-
-  // Third, here's a simpler, three-step gradient, from black to red to white
-  //   state->palette = CRGBPalette16( CRGB::Black, CRGB::Red, CRGB::White);
-
   // Wire together components - weird syntax is a closure
   fadeControl.onFadeOutEnd = ([]() { wakePatterns.next(); });
   fadeControl.onFadeInEnd = ([]() { sleepPatterns.next(); });
+
+  sleepState.setPalette(&palette);
+  wakeState.setPalette(&palette);
 
   wakePatterns.setState(&wakeState);
   sleepPatterns.setState(&sleepState);

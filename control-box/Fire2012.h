@@ -11,12 +11,13 @@ class Fire2012: public Pattern {
     bool _reverseDirection;
   
   public:
-    Fire2012(reverseDirection = false): _reverseDirection(reverseDirection) {};
+    Fire2012(bool reverseDirection = false): _reverseDirection(reverseDirection) {};
     
     void loop(byte fade)
     {
       // Array of temperature readings at each simulation cell
-      static byte heat[NUM_LEDS];
+      byte *heat = _state->getActivation();
+      CRGBPalette16 *palette = _state->getPalette();
 
       // Step 1.  Cool down every cell a little
       for ( int i = 0; i < NUM_LEDS; i++) {
@@ -39,7 +40,7 @@ class Fire2012: public Pattern {
         // Scale the heat value from 0-255 down to 0-240
         // for best results with color palettes.
         byte colorindex = scale8(heat[j], 240);
-        CRGB color = ColorFromPalette(_state->palette, colorindex);
+        CRGB color = ColorFromPalette(*palette, colorindex);
         int pixelnumber;
         if (_reverseDirection) {
           pixelnumber = (NUM_LEDS - 1) - j;

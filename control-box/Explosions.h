@@ -31,6 +31,8 @@ class Explosions: public Pattern {
       int i;
       int x;
 
+      CRGBPalette16 *palette = _state->getPalette();
+
       if (random(100) < SPAWN_EXPLOSION) {
         int i = random(NUM_EXPLOSIONS - 1);
         _explosions[i].active = true;
@@ -64,7 +66,7 @@ class Explosions: public Pattern {
 
           // use 240 instead of 255 to only use part of the palette
           byte modulus = (int) 240 - (240 * abs(x) / (_explosions[i].size / 2));
-          _state->leds[y] = ColorFromPalette(_state->palette, modulus);
+          _state->leds[y] = ColorFromPalette(*palette, modulus);
         }
       }
     }
