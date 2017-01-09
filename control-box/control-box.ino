@@ -29,16 +29,7 @@
   #define DEBUG_PRINT(msg) ()
 #endif
 
-
-bool gReverseDirection = false;
-
 // Activation values that can be used as an intermediary
-
-// Last time sensor was triggered
-unsigned long lastTriggered;
-
-// First trigger of sequence
-unsigned long firstTriggered;
 
 #include "PinSensor.h"
 #include "ASRFader.h"
@@ -113,31 +104,21 @@ void setup() {
   sleepPatterns.setState(&sleepState);
   crossfader.setState(&state);
 
-  // Set up components
+  // Start components
   fadeControl.setup();
   crossfader.setup();
 }
 
 void loop()
 {
-  // Add entropy to random number generator; we use a lot of it.
-  random16_add_entropy( random());
-
-  // Fourth, the most sophisticated: this one sets up a new palette every
-  // time through the loop, based on a hue that changes every time.
-  // The palette is a gradient from black, to a dark color based on the hue,
-  // to a light color based on the hue, to white.
-  //
-  //   static uint8_t hue = 0;
-  //   hue++;
-  //   CRGB darkcolor  = CHSV(hue,255,192); // pure hue, three-quarters brightness
-  //   CRGB lightcolor = CHSV(hue,128,255); // half 'whitened', full brightness
-  //   state->palette = CRGBPalette16( CRGB::Black, darkcolor, lightcolor, CRGB::White);
+  // Add entropy to random number generator; we use a lot of it
+  random16_add_entropy(random());
 
   fadeControl.loop();
-
   crossfader.loop(fadeControl.fade());
 
   FastLED.show(); // display this frame
+
+  // Run loop() once per frame
   FastLED.delay(1000 / FRAMES_PER_SECOND);
 }

@@ -7,7 +7,12 @@
  * Fire2012 pattern - copied from demo
  */
 class Fire2012: public Pattern {
+  private:
+    bool _reverseDirection;
+  
   public:
+    Fire2012(reverseDirection = false): _reverseDirection(reverseDirection) {};
+    
     void loop(byte fade)
     {
       // Array of temperature readings at each simulation cell
@@ -36,7 +41,7 @@ class Fire2012: public Pattern {
         byte colorindex = scale8(heat[j], 240);
         CRGB color = ColorFromPalette(_state->palette, colorindex);
         int pixelnumber;
-        if (gReverseDirection) {
+        if (_reverseDirection) {
           pixelnumber = (NUM_LEDS - 1) - j;
         } else {
           pixelnumber = j;

@@ -48,5 +48,5 @@ class CrossFader : public Pattern {
             _state->leds[i] = blend(leftLEDs[i], rightLEDs[i], fade);
           }
       }
-    }
+   }
 };
