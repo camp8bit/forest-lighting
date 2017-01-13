@@ -67,10 +67,14 @@ void loop()
     return;
   }
 
-  uint8_t bass = mapNoise(MSGEQ7.get(MSGEQ7_LOW));
-  uint8_t mid = mapNoise(MSGEQ7.get(MSGEQ7_MID));
-  uint8_t treble = mapNoise(MSGEQ7.get(MSGEQ7_HIGH));
-  uint8_t val = 0;
+  // get the values of from frequenzy band 0, 3 and 5 (63Hz, 1kHz, 2.5kHz and 6.25KHz)
+  byte bass = mapNoise(MSGEQ7.get(MSGEQ7_LOW));
+  byte mid = mapNoise(MSGEQ7.get(MSGEQ7_MID));
+  byte treble = mapNoise(MSGEQ7.get(MSGEQ7_HIGH));
+
+  byte val = 0;
+
+  // the priority of which value and palette is bass > mid > treble
   if(bass > mid) {
     val = bass;
     state.setPalette(&bass_palette);
@@ -84,5 +88,5 @@ void loop()
 
   patternList.loop(val);
 
-  FastLED.show(); // display this frame
+  FastLED.show();
 }
