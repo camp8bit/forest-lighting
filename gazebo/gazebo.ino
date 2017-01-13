@@ -82,7 +82,7 @@ void loop()
     state.setPalette(&treble_palette);
   }
 
-  patternList.loop(val, MSGEQ7.getVolume());
+  patternList.loop(val);
 
   FastLED.show(); // display this frame
 }

@@ -18,8 +18,8 @@ class PatternList: public Pattern {
       _patterns[_curPattern]->setup();
     }
 
-    void loop(byte fade, byte volume) {
-      _patterns[_curPattern]->loop(fade, volume);
+    void loop(byte fade) {
+      _patterns[_curPattern]->loop(fade);
     }
 
     void setState(PatternState *state)

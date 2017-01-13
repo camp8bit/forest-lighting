@@ -36,9 +36,8 @@ class PatternState {
 
     byte *getActivation()
     {
-      // Allocate the byte array if it hasn't realy been allocated
+      // Allocate the byte array if it hasn't already been allocated
       if ((unsigned int)activation == 0) {
-        Serial.println("Allocating activation");
         activation = new byte[NUM_LEDS];
         for(byte i = 0; i < NUM_LEDS; i++) {
           activation[i] = 0;

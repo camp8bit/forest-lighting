@@ -27,7 +27,7 @@ class Explosions: public Pattern {
       }
     }
 
-    void loop(byte fade, byte volume)
+    void loop(byte fade)
     {
       int i;
       int x;
@@ -66,8 +66,7 @@ class Explosions: public Pattern {
 
           // use 240 instead of 255 to only use part of the palette
           byte modulus = (int) 240 - (240 * abs(x) / (_explosions[i].size / 2));
-          byte brightness = scale8_video(dim8_raw(_explosions[i].value),volume);
-          _state->leds[y] = ColorFromPalette(*_explosions[i].palette, modulus, brightness);
+          _state->leds[y] = ColorFromPalette(*_explosions[i].palette, modulus, dim8_raw(_explosions[i].value));
         }
       }
     }
