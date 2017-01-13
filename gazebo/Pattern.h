@@ -26,13 +26,14 @@ class Pattern {
      * @param _state->leds The LED strip to draw to
      * @param fade The activation level of this pattern. Use this to fade patterns in and out
      */
-    virtual void loop(byte fade) = 0;
+    virtual void loop(byte fade, byte volume) = 0;
 
     /**
      * Link a PatternState to this pattern.
      */
     virtual void setState(PatternState *state)
     {
+      Serial.println("setting state");
       _state = state;
     };
 
@@ -41,6 +42,7 @@ class Pattern {
      */
     CRGB *getLEDs()
     {
+      Serial.println("get leds");
       return _state->leds;
     };
 };
