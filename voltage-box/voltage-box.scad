@@ -6,8 +6,8 @@ THICK=2;
 SCREW_R=2.5/2;
 
 //box_top();
-box_bottom();
-//exploded_view();
+//box_bottom();
+exploded_view();
 
 module exploded_view() {
     translate([0,0,20]) scale([1,1,-1]) box_top();
@@ -15,9 +15,18 @@ module exploded_view() {
 }
 
 module box_top() {
-    scale([1,1,-1]) intersection() {
-        translate([0,0,500]) cube([1000,1000,1000], center=true);
-        box(screw_r = 1.5);
+    scale([1,1,-1]) union() {
+        intersection() {
+            translate([0,0,500]) cube([1000,1000,1000], center=true);
+            box(screw_r = 1.5);
+        }
+        // Tabs to hold top to bottom
+        for(a=[0,180])
+            rotate([0,0,a])
+                translate([0,INNER_D/2-1,7])
+                    cube([INNER_W-16,2,18], center=true);
+        translate([-(INNER_D/2-2.5-1),0,7])
+            cube([2,INNER_W-16,18], center=true);
     }
 }
 
@@ -37,7 +46,7 @@ module box() {
                     r=5,
                     inset=[5,0,0]
                 );
-                cube(size=[INNER_W - 2.5, INNER_D, INNER_H], center=true);
+                cube(size=[INNER_W - 5, INNER_D, INNER_H], center=true);
             }
             for(x=[-1,1]) for(y=[-1,1])
                 translate([x*(INNER_W/2-5+THICK),y*(INNER_D/2-5+THICK),0])
