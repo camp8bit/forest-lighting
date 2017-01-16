@@ -30,9 +30,9 @@ PatternList patternList(1, patterns);
 
 PatternState state;
 
-CRGBPalette16 bass_palette(CRGB::Black, CRGB(0,0,255), CRGB::DeepPink, CRGB::Purple);
+CRGBPalette16 bass_palette(CRGB::Black, CRGB::DarkBlue, CRGB::MediumPurple, CRGB::Purple);
 CRGBPalette16 mid_palette(CRGB::Black, CRGB::Orange, CRGB::DarkRed, CRGB::Maroon);
-CRGBPalette16 treble_palette(CRGB::Black, CRGB(85,85,85), CRGB(170,170,170), CRGB::White);
+CRGBPalette16 treble_palette(CRGB::Black, CRGB(32, 32, 32), CRGB(64, 64, 64), CRGB::White);
 
 void setup() {
   Serial.begin(9600);
@@ -42,7 +42,7 @@ void setup() {
 
   MSGEQ7.begin();
 
-  delay(500); // sanity delay
+  delay(2000); // sanity check delay - allows reprogramming if accidentally blowing power w/leds
   FastLED.addLeds<CHIPSET, LED_PIN, COLOR_ORDER>(state.leds, NUM_LEDS).setCorrection( TypicalLEDStrip );
   FastLED.setBrightness( BRIGHTNESS );
   FastLED.setMaxPowerInVoltsAndMilliamps(5, 600);

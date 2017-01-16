@@ -1,8 +1,7 @@
 #include "Pattern.h"
 
-#define SPAWN_EXPLOSION 10
-#define EXPLOSION_SIZE 5
-#define NUM_EXPLOSIONS 10
+#define EXPLOSION_SIZE 9
+#define NUM_EXPLOSIONS 16
 
 struct explosion {
   bool active;
@@ -32,7 +31,7 @@ class Explosions: public Pattern {
       int i;
       int x;
 
-      if (fade > 100) {
+      if (fade > 4) {
         int i = random(NUM_EXPLOSIONS - 1);
         _explosions[i].active = true;
         _explosions[i].size = 0;
@@ -66,7 +65,7 @@ class Explosions: public Pattern {
 
           // use 240 instead of 255 to only use part of the palette
           byte modulus = (int) 240 - (240 * abs(x) / (_explosions[i].size / 2));
-          _state->leds[y] = ColorFromPalette(*_explosions[i].palette, modulus, dim8_raw(_explosions[i].value));
+          _state->leds[y] = ColorFromPalette(*_explosions[i].palette, modulus, (_explosions[i].value));
         }
       }
     }
