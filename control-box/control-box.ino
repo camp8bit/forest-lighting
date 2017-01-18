@@ -8,7 +8,7 @@
 #define CHIPSET     WS2812B
 
 // Number of seconds to stay on for
-#define DURATION (3600l * 1000l * 12l)
+#define DURATION (3600l * 1000l * 9l)
 
 #define BRIGHTNESS  255
 #define FRAMES_PER_SECOND 120
@@ -118,7 +118,7 @@ void setup() {
   crossfader.setState(&state);
 
   random16_add_entropy(random());
-   wakePatterns.rand();
+  wakePatterns.rand();
 
   // Start components
   fadeControl.setup();
@@ -217,12 +217,12 @@ void loop()
       case 0: palette = CRGBPalette16(CRGB::Black, CRGB::Red, CRGB::Yellow, CRGB::White); break;
       case 1: palette = CRGBPalette16(CRGB::Black, CRGB::MediumPurple, CRGB::DeepPink, CRGB::White); break;
       case 2: palette = CRGBPalette16( CRGB::Black, CRGB::Blue, CRGB::Aqua,  CRGB::White); break;
-      case 3: palette = CRGBPalette16(CRGB::Black, CRGB(16,16,16), CRGB(64,64,64), CRGB::Green); break;
+      case 3: palette = RainbowColors_p; palette[0] = CRGB::Black; break;
       case 4: palette = CRGBPalette16(CRGB::Black, CRGB::White, CRGB::Yellow, CRGB::Black); break;
       case 5: palette = CRGBPalette16( CRGB::Black, CRGB::ForestGreen, CRGB::Lime,  CRGB::White); break;
-      case 6: palette = RainbowColors_p; palette[0] = CRGB::Black; break;
-      case 7: palette = RainbowColors_p; palette[0] = CRGB::Black; break;
-      case 8: palette = RainbowColors_p; palette[0] = CRGB::Black; break;
+      case 6: palette = CRGBPalette16(CRGB::Black, CRGB(16,16,16), CRGB(64,64,64), CRGB::Green); break;
+      case 7: palette = CRGBPalette16(CRGB::Black, CRGB::White, CRGB::Black, CRGB::White); break;
+      case 8: palette = CRGBPalette16(CRGB::Black, CRGB::Red, CRGB::Yellow, CRGB::White); break;
     }
     
   }
