@@ -21,8 +21,8 @@ class Twinkle: public Pattern {
       byte *activation = _state->getActivation();
       CRGBPalette16 *palette = _state->getPalette();
 
-      // 3% chance of creating a droplet
-      if(random(100) < 3) {
+      // 1% chance of creating a droplet
+      if(random(100) < 1) {
         activation[random(NUM_LEDS)] = 255;
       }
 

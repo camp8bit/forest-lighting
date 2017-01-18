@@ -6,6 +6,9 @@
 #define COLOR_ORDER GRB
 #define CHIPSET     WS2812B
 
+// Number of seconds to stay on for
+#define DURATION 360000 // * 60 * 9
+
 #define BRIGHTNESS  255
 #define FRAMES_PER_SECOND 120
 #define STRIPE_WIDTH 30
@@ -15,8 +18,8 @@
 
 // ms of fade up
 #define FADE_UP 5000
-#define MIN_PERIOD (FADE_UP + 15000)
-#define FADE_DOWN 10000
+#define MIN_PERIOD (FADE_UP + 5000)
+#define FADE_DOWN 5000
 
 #ifdef DEV_MODE
   #define NUM_LEDS    60
@@ -45,6 +48,9 @@
 #include "Fire2012.h"
 #include "Explosions.h"
 #include "Noise.h"
+// #include "Pulse.h"
+#include "Sweep.h"
+#include "ZigZag.h"
 
 // Fader control will fade the lights up when someone enters the scene, then keep
 // them faded up for a minimum period. If the PIR triggers again in this time
@@ -65,8 +71,8 @@ CRGBPalette16 palette(CRGB::Black, CRGB(0,0,255), CRGB(0,255,255), CRGB::White);
     // CRGBPalette16 palette( CRGB::Black, CRGB::Red, CRGB::White);
 
 // Configure the patterns available
-Pattern *wakePatternItems[] = { new Explosions(), new Fire2012(), new PlasmaTwo(), new PlasmaDirectional() };
-PatternList wakePatterns(4, wakePatternItems);
+Pattern *wakePatternItems[] = { new Sweep(), new ZigZag(), new Explosions(), new Fire2012(), new PlasmaTwo(), new PlasmaDirectional() };
+PatternList wakePatterns(5, wakePatternItems);
 
 Pattern *sleepPatternItems[] = { new Twinkle() };
 PatternList sleepPatterns(1, sleepPatternItems);
@@ -86,7 +92,7 @@ void setup() {
   FastLED.addLeds<CHIPSET, LED_PIN, COLOR_ORDER>(state.leds, NUM_LEDS).setCorrection( TypicalLEDStrip );
   FastLED.setBrightness( BRIGHTNESS );
 
-  FastLED.setMaxPowerInVoltsAndMilliamps(5, 600);
+  FastLED.setMaxPowerInVoltsAndMilliamps(5, 500);
 
   // Wire together components - weird syntax is a closure
   fadeControl.onFadeOutEnd = ([]() { wakePatterns.next(); });
@@ -104,14 +110,40 @@ void setup() {
   crossfader.setup();
 }
 
+byte flicker;
+
 void loop()
 {
+  flicker++;
+
   // Add entropy to random number generator; we use a lot of it
   random16_add_entropy(random());
 
   fadeControl.loop();
   crossfader.loop(fadeControl.fade());
 
+  CRGB *leds = crossfader.getLEDs();
+
+  // Display the progress of the night
+  long i = NUM_LEDS * millis() / DURATION;
+
+  // Ghetto clamp
+  i = min(max(i, 1), NUM_LEDS - 2);
+  
+  leds[i-1] = CRGB::Black;
+  leds[i] = CRGB::Green;
+  leds[i+1] = CRGB::Black;
+
+  // Turn off
+  if (millis() > DURATION) {
+    fill_solid(leds, NUM_LEDS, CRGB::Black);
+
+    // Blink led
+    if (millis() % 500 < 250) {
+      leds[0] = CRGB(128, 0, 0);
+    }
+  }
+  
   FastLED.show(); // display this frame
 
   // Run loop() once per frame
