@@ -31,10 +31,18 @@ class PatternList: public Pattern {
     }
 
     /**
-     * Switch to the next pattern
+     * Switch to the next ponattern
      */
     void next() {
       _curPattern = (_curPattern + 1) % _numPatterns;
+      setup();
+    }
+
+    /**
+     * Switch to a random pattern
+     */
+    void rand() {
+      _curPattern = random(_numPatterns);
       setup();
     }
 };

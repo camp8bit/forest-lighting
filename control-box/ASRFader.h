@@ -108,6 +108,7 @@ class ASRFader {
       switch(_status) {
         case PIR_OFF:
           if (turnOn) {
+          DEBUG_PRINT("starting fade in");
             _status = PIR_FADEIN;
             if(onFadeInStart != NULL) onFadeInStart();
           }
@@ -119,6 +120,7 @@ class ASRFader {
           } else {
             _fade -= _fadeOutPerMS * (now - _lastNow);
             if(_fade <= 0.0) {
+              DEBUG_PRINT("fulled faded out");
               _fade = 0.0;
               _status = PIR_OFF;
               if(onFadeOutEnd != NULL) onFadeOutEnd();
@@ -128,6 +130,7 @@ class ASRFader {
 
         case PIR_ON:
           if (turnOff) {
+              DEBUG_PRINT("staring fade out");
             _status = PIR_FADEOUT;
             if(onFadeOutStart != NULL) onFadeOutStart();
           }
@@ -139,6 +142,7 @@ class ASRFader {
           } else {
             _fade += _fadeInPerMS * (now - _lastNow);
             if(_fade >= 1.0) {
+              DEBUG_PRINT("fully faded in");
               _fade = 1.0;
               _status = PIR_ON;
               if(onFadeInEnd != NULL) onFadeInEnd();

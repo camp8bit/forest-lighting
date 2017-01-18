@@ -21,8 +21,8 @@ class Twinkle: public Pattern {
       byte *activation = _state->getActivation();
       CRGBPalette16 *palette = _state->getPalette();
 
-      // 1% chance of creating a droplet
-      if(random(100) < 1) {
+      // 3% chance of creating a droplet
+      if(random(100) < 3) {
         activation[random(NUM_LEDS)] = 255;
       }
 
@@ -32,17 +32,17 @@ class Twinkle: public Pattern {
       for (i = 0; i < NUM_LEDS; i++) {
         if(activation[i] > 0) {
           activation[i]--;
-
-          // Color bounces from black to white and back
-          if(activation[i] > 127) {
-            colorRef = (255-activation[i]) * 2;
-          } else {
-            colorRef = activation[i] * 2;
-          }
-
-          // Re-draw pixel
-          _state->leds[i] = ColorFromPalette(*palette, colorRef);
         }
+
+        // Color bounces from black to white and back
+        if(activation[i] > 127) {
+          colorRef = (255-activation[i]) * 2;
+        } else {
+          colorRef = activation[i] * 2;
+        }
+
+        // Re-draw pixel
+        _state->leds[i] = ColorFromPalette(*palette, colorRef);
       }
 
     }
