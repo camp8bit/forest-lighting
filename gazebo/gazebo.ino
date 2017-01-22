@@ -13,7 +13,6 @@
 #include "PatternState.h"
 #include "PatternList.h"
 
-#include "Plasma.h"
 #include "Explosions.h"
 
 #define MSGEQ7_MEASURE_PIN  A0
