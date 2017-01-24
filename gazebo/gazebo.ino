@@ -1,3 +1,9 @@
+// Hacked support for this into clockless_trinket.h. Must set before including FastLED.h
+// You will need to apply this patch to your local FastLED library for this to work
+// https://gist.github.com/5a8dade9a59e45ba6faa8198105a5c08
+
+#define FASTLED_REPEAT_LEDS 2
+
 #include <FastLED.h>
 // MSGEQ7 by NicoHood
 #include <MSGEQ7.h>
@@ -8,7 +14,7 @@
 
 #define BRIGHTNESS  255
 #define FRAMES_PER_SECOND 120
-#define NUM_LEDS 250
+#define NUM_LEDS 240
 
 #include "PatternState.h"
 #include "PatternList.h"
@@ -44,7 +50,7 @@ void setup() {
   delay(2000); // sanity check delay - allows reprogramming if accidentally blowing power w/leds
   FastLED.addLeds<CHIPSET, LED_PIN, COLOR_ORDER>(state.leds, NUM_LEDS).setCorrection( TypicalLEDStrip );
   FastLED.setBrightness( BRIGHTNESS );
-  FastLED.setMaxPowerInVoltsAndMilliamps(5, 600);
+  FastLED.setMaxPowerInVoltsAndMilliamps(5, 1500); // 375 / m for 4 metres replicated 4 times3
 
   // 3 blink boot indicator
   for (int i = 0; i < 4; ++i) {
