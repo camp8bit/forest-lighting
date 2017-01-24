@@ -1,13 +1,19 @@
 $fn = 40;
-INNER_W=100;
-INNER_D=100;
-INNER_H=30;
-THICK=2;
+INNER_W=55;
+INNER_D=40;
+INNER_H=20;
+THICK=1;
 SCREW_R=2.5/2;
 
 box_top();
 //box_bottom();
 //exploded_view();
+//plated_view();
+
+module plated_view() {
+    translate([0,INNER_D+10,0]) box_top();
+    box_bottom();
+}
 
 module exploded_view() {
     translate([0,0,20]) rotate([180,0,0]) box_top();
@@ -23,17 +29,15 @@ module box_top() {
         // Tabs to hold top to bottom
         for(a=[0,180])
             rotate([0,0,a])
-                translate([0,INNER_D/2-0.5,7])
-                    cube([INNER_W-16,1,18], center=true);
-        translate([-(INNER_D/2-2.5-0.5),0,7])
-            cube([1,INNER_W-16,18], center=true);
+                translate([0,INNER_D/2-0.5,5])
+                    cube([INNER_W-16,1,INNER_H/2+1.5], center=true);
     }
 }
 
 module box_bottom() {
    intersection() {
         translate([0,0,-500]) cube([1000,1000,1000], center=true); 
-        box(screw_r = 1.25);
+        box(screw_r = 1.5);
     }
 }
     
@@ -43,41 +47,42 @@ module box() {
             difference() {
                 rounded_cube(
                     size=[INNER_W+THICK*2, INNER_D+THICK*2, INNER_H+THICK*2],
-                    r=5,
-                    inset=[5,0,0]
+                    r=4
                 );
-                cube(size=[INNER_W - 5, INNER_D, INNER_H], center=true);
+                cube(size=[INNER_W, INNER_D, INNER_H], center=true);
             }
             for(x=[-1,1]) for(y=[-1,1])
-                translate([x*(INNER_W/2-5+THICK),y*(INNER_D/2-5+THICK),0])
-                    cylinder(r=5,h=INNER_H+THICK,center=true);
+                translate([x*(INNER_W/2-4+THICK),y*(INNER_D/2-4+THICK),0])
+                    cylinder(r=4,h=INNER_H+THICK,center=true);
         }
 
         // Screw holes
         for(x=[-1,1]) for(y=[-1,1])
-            translate([x*(INNER_W/2-5+THICK),y*(INNER_D/2-5+THICK),THICK]) {
-                // Countersink
-                translate([0,0, INNER_H/2]) cylinder(r=3.5,h=6,center=true);
+            translate([x*(INNER_W/2-4+THICK),y*(INNER_D/2-4+THICK),THICK]) {
                 // Screw
                 cylinder(r=screw_r,h=INNER_H+THICK+0.01,center=true);
             }
             
         // Cut holes for components
-        translate([INNER_W/2,-30,0])
-            cube(size=[10,12,19], center=true);
+        translate([INNER_W/2,3,-5])
+            cube(size=[10,8,4], center=true);
 
-        translate([INNER_W/2,-10,0])
+        translate([INNER_W/2,-8,0])
             cube(size=[10,5,3], center=true);
 
+        translate([-INNER_W/2,0,0])
+            rotate([0,90,0])
+                cylinder(r=2.5, h=10, center=true);
+
+
+/*(
         translate([INNER_W/2,30,0])
             cube(size=[10,5,2], center=true);
-
             
         for(y=[10,30])
             translate([-INNER_W/2,y,-7.5])
-                rotate([0,90,0])
-                    cylinder(r=2.5, h=10, center=true);
 
+*/
     }
     
     
