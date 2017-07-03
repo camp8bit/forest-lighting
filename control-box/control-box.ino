@@ -208,8 +208,8 @@ void loop()
   } else {
     fill_solid(leds, NUM_LEDS, CRGB::Black);
 
-    // Blink led
-    if (millis() % 500 < 250) {
+    // Blink led - 0.2s every 5s
+    if (millis() % 5000 < 200) {
       leds[0] = CRGB(0, 0, 128);
     }
   }
