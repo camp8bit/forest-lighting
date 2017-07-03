@@ -96,6 +96,8 @@ PatternState state, sleepState, wakeState;
 
 byte palIdx = 0;
 
+void (* resetArduino) (void) = 0;
+
 void setup() {
   Serial.begin(9600);
   Serial.println("control-box 2017 - by camp8bit");
@@ -215,7 +217,7 @@ void loop()
   }
 
   // Restart the arduino
-  if (millis > RESET_DURATION) {
+  if (millis() > RESET_DURATION) {
     resetArduino();
   }
 
@@ -240,14 +242,4 @@ void loop()
 
   // Run loop() once per frame
   FastLED.delay(1000 / FRAMES_PER_SECOND);
-}
-
-
-/**
- * Reset the Arduino using the built-in watchdog
- */
-void resetArduino() {
-  wdt_enable(WDTO_15MS);
-  // Will reser after 15ms of waiting
-  while (1) {}
 }
