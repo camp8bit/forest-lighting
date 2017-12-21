@@ -1,4 +1,5 @@
 #include <FastLED.h>
+#include <avr/wdt.h>
 
 //#define DEV_MODE
 #define DEBUG
@@ -7,8 +8,9 @@
 #define COLOR_ORDER GRB
 #define CHIPSET     WS2812B
 
-// Number of seconds to stay on for
-#define DURATION (3600l * 1000l * 9l)
+// Number of milliseconds to stay on for
+#define DURATION (3600l * 1000l * 12l)
+#define RESET_DURATION (3600l * 1000l * 24l)
 
 #define BRIGHTNESS  255
 #define FRAMES_PER_SECOND 120
@@ -93,6 +95,8 @@ CrossFader crossfader(&sleepPatterns, &wakePatterns);
 PatternState state, sleepState, wakeState;
 
 byte palIdx = 0;
+
+void (* resetArduino) (void) = 0;
 
 void setup() {
   Serial.begin(9600);
@@ -185,29 +189,36 @@ void loop()
   // Add entropy to random number generator; we use a lot of it
   random16_add_entropy(random());
 
-  fadeControl.loop();
-  crossfader.loop(fadeControl.fade());
-
   CRGB *leds = crossfader.getLEDs();
 
-  // Display the progress of the night
-  long i = NUM_LEDS * millis() / DURATION;
-
-  // Ghetto clamp
-  i = min(max(i, 1), NUM_LEDS - 2);
+  // Run patterns
+  if (millis() <= DURATION) {
+    fadeControl.loop();
+    crossfader.loop(fadeControl.fade());
   
-  leds[i-1] = CRGB::Black;
-  leds[i] = CRGB::White;
-  leds[i+1] = CRGB::Black;
-
+    // Display the progress of the night
+    long i = NUM_LEDS * millis() / DURATION;
+  
+    // Ghetto clamp
+    i = min(max(i, 1), NUM_LEDS - 2);
+    
+    leds[i-1] = CRGB::Black;
+    leds[i] = CRGB::White;
+    leds[i+1] = CRGB::Black;
+  
   // Turn off
-  if (millis() > DURATION) {
+  } else {
     fill_solid(leds, NUM_LEDS, CRGB::Black);
 
-    // Blink led
-    if (millis() % 500 < 250) {
+    // Blink led - 0.2s every 5s
+    if (millis() % 5000 < 200) {
       leds[0] = CRGB(0, 0, 128);
     }
+  }
+
+  // Restart the arduino
+  if (millis() > RESET_DURATION) {
+    resetArduino();
   }
 
   // Change palette periodically
