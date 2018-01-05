@@ -63,14 +63,14 @@ lidCorner=12;
 //box();
 //test_box();
 //m3_nut_trap(up=4, down=30);
-//rotate([0,180,0]) lid();
+rotate([0,180,0]) lid();
 //pulley();
 //pulley_spacer();
 //test_undercarriage();
 //undercarriage();
 
 //exploded_view( explode = (cos($t*360)+1)*25);
-exploded_view( explode = 10);
+//exploded_view( explode = 30);
 
 module exploded_view(explode) {
     translate([0,height/2,width/2]) rotate([90,0,0]) {
@@ -373,56 +373,67 @@ module undercarriage(test = 0) {
     mountAngs = [-30,0,30,60,90,120,150,180,210];
 
     translate([-outerFanR,0,0]) {
+
         difference() {
+            // Add region for nut traps()
             union() {
-                undercarriage_cylinder();
+                // Main body subtraction
+                difference() {
+                    union() {
+                        undercarriage_cylinder();
 
-                // Spline for light mounts
-                path = [
-                    [2.5,fanR+thickness],
-                    [length * 0.2, fanR*1.5],
-                    //[length * 0.5, fanR*1.45],
-                    [length-2.5 , fanR+thickness]
-                ];
-                
-                // Array of light mounts
-                for(ang = mountAngs)
-                    rotate([ang,-90,0])
-                        translate([0,0,-6])
-                            linear_extrude(height=12)
-                                spline_ribbon(path, width=5, loop=false, $fn=16);
+                        // Spline for light mounts
+                        path = [
+                            [2.5,fanR+thickness],
+                            [length * 0.2, fanR*1.5],
+                            //[length * 0.5, fanR*1.45],
+                            [length-2.5 , fanR+thickness]
+                        ];
+                        
+                        // Array of light mounts
+                        for(ang = mountAngs)
+                            rotate([ang,-90,0])
+                                translate([0,0,-6])
+                                    linear_extrude(height=12)
+                                        spline_ribbon(path, width=5, loop=false, $fn=16);
+                    }
+                    // Hollow
+                    translate([0,0,length-5+.01]) cylinder(h=5, r1 = fanR, r2 = fanEndR);
+                    translate([0,0,-1 -5]) cylinder(h=length + 2, r = fanR);
 
-                //translate([fanR,-width/2,0])
-                //    cube(size = [thickness, width, length]);
+                    // Holes for light wiring
+                    for(ang = mountAngs) {
+                        translate([0,0,25])
+                            rotate([90+ang,90,0]) rotate([0,30,0])
+                                translate([-1.5,-3,0]) cube([3,6,50]);
+
+                        translate([0,0,length-80])
+                            rotate([90+ang,90,0])
+                                translate([0,0,outerFanR-5])
+                                rotate([0,-83,0])
+                                    cylinder(r=1.25, h=100);
+                    }
+                }
+
+                for(z = [length/2-bottomBoltShift,length/2+bottomBoltShift])
+                    intersection() {
+                        translate([fanR,0,z]) cube([5,25,20], center=true);
+                        translate([fanR,0,z]) rotate([0,45,0]) cube([50,50,9], center=true);                    translate([fanR,0,z]) rotate([0,-45,0]) cube([50,50,9], center=true);                    undercarriage_cylinder();        
+                    }
             }
-            // Hollow
-            translate([0,0,length-5+.01]) cylinder(h=5, r1 = fanR, r2 = fanEndR);
-            translate([0,0,-1 -5]) cylinder(h=length + 2, r = fanR);
 
             // Bolt hole to fix fan
             translate([0,0,length-18]) rotate([90,0,0]) cylinder(d=4, h=50);
             translate([0,-outerFanR,length-18]) rotate([90,0,0]) cylinder(d=8, h=60);
             
             // Nut traps for mounting to box
-                // TO DO
+            for(z = [length/2-bottomBoltShift,length/2+bottomBoltShift]) 
+                translate([fanR,0,z]) rotate([0,-90,0])
+                    m3_nut_trap(up=3,down=20);
 
             // Conduit hole
             translate([fanR,0,length/2+bottomConduitShift])
                 rotate([0,90,0]) cylinder(h=30, r=bottomConduitR, center=true);
-
-            // Holes for light wiring
-            for(ang = mountAngs) {
-                translate([0,0,25])
-                    rotate([90+ang,90,0]) rotate([0,30,0])
-                        translate([-1.5,-3,0]) cube([3,6,50]);
-
-                translate([0,0,length-80])
-                    rotate([90+ang,90,0])
-                        translate([0,0,outerFanR-5])
-                        rotate([0,-83,0])
-                            cylinder(r=1.25, h=100);
-            }
-        
         }
     }
 }
