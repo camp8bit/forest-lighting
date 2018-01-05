@@ -28,6 +28,10 @@ module box_bottom() {
         
         // Headphone jack hole
         translate([0,5,0]) rotate([0,90,0]) cylinder(h=100, r=3.25);
+        
+        // Cable tie hole
+        translate([innerSize[0]/2,0, -innerSize[2]/2+2]) cube(size=[5,5,2], center = true);
+        translate([innerSize[0]/2-2,0, -innerSize[2]/2]) cube(size=[2,5,5], center = true);
     }
 
     // Screw mounts
@@ -83,8 +87,8 @@ module box_top() {
  */
 module button_pin_holes() {
     for(scaleA=[2.5,-2.5]) for(scaleB=[3,-3]) {
-        translate([scaleA,scaleB,0]) cylinder(h=10,r=0.8, center=true);
-        translate([0,0,5]) cube(size=[7,8,10], center=true);        
+        translate([scaleA,scaleB,0]) cylinder(h=10,r=0.7, center=true);
+        translate([0,0,5]) cube(size=[6.5,7.5,10], center=true);        
     }
 }
 
@@ -93,7 +97,7 @@ module button_pin_holes() {
  * Origin is at the top of the hole
  */
 module screw_hole_4g_countersunk() {
-    rWide = 2.5;
+    rWide = 2.75;
     rNarrow = 1;
     countersink = 2;
     
