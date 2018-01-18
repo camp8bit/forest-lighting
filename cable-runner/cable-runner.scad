@@ -77,7 +77,7 @@ drivePulley();
 //undercarriage();
 
 //exploded_view( explode = (cos($t*360)+1)*25);
-exploded_view( explode = 0);
+// exploded_view( explode = 0);
 
 module exploded_view(explode) {
     translate([0,height/2,width/2]) rotate([90,0,0]) {
@@ -373,18 +373,21 @@ module drivePulley() {
     //# cylinder(r=11, h= 20);
 
     insetForAxel = pulleyW / 2 + 2;
+    shaftRadius = 2.45; // is 2.5mm, undersizing it by 0.05mm
     
     difference() {
         translate([0,0,pulleyW/2]) rotate_extrude()
             rotate([0,0,-90]) polygon(points = [
                 // Main shape
-                [pulleyW/2,2.5], [pulleyW/2,pulleyR],
+                [pulleyW/2 + 6, shaftRadius], 
+                [pulleyW/2 + 6,pulleyR],
+                [pulleyW/2,pulleyR],
                 // Round for cable
                 [cableW/2,innerR], [0, innerR-cableW*.2], [-cableW/2,innerR],
                 [-pulleyW/2,pulleyR],
                 [-pulleyW/2,5],
                 [-pulleyW/2 + insetForAxel,5],
-                [-pulleyW/2 + insetForAxel,2.5],
+                [-pulleyW/2 + insetForAxel, shaftRadius],
                 ]); 
 
     }
