@@ -54,9 +54,9 @@ outerArmGap = height-armSize[2]*2;
 lidCorner=12;
 rotate([90,0,0])
   translate([0,25,0])
-    arm();
+    stepper_arm();
 
- module arm() {
+ module stepper_arm() {
      // Amount of arms that are purely vertical
      flatH = 14;
      
@@ -82,9 +82,9 @@ rotate([90,0,0])
              // stepper mount holes
              translate([30,-20.5,10]) {
                for(scaleX=[-1,1], scaleZ=[-1,1]) scale([scaleX,1,scaleZ]) {
-                   translate([15,10,15])
-                     rotate([90,0,0])
-                       cylinder(h=100, r=1.5);
+                   translate([15,4.01,15])
+                     rotate([-90,0,0])
+                       m3_bolt_hole(length=100);
                }
            }
             
@@ -115,7 +115,7 @@ rotate([90,0,0])
                 -height/2 - .01 - 30,
                 (armSize[1]-5)/2
             ]) rotate([90,0,0])
-                m8_square_end_bolt_hole(length=100);
+               cylinder(d=23, h=100, center=true);
 
          }
      }
