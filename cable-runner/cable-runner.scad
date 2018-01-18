@@ -64,7 +64,7 @@ lidCorner=12;
 //test_box();
 //m3_nut_trap(up=4, down=30);
 // rotate([0,180,0]) lid();
-drivePulley();
+rotate([180,0,0]) drivePulley();
 //stepper_arm();
 //arm();
 //box();
@@ -373,23 +373,36 @@ module drivePulley() {
     //# cylinder(r=11, h= 20);
 
     insetForAxel = pulleyW / 2 + 2;
-    shaftRadius = 2.45; // is 2.5mm, undersizing it by 0.05mm
+    shaftRadius = 2.5; // is 2.5mm, undersizing it by 0.05mm
+
+    shaftR = 11;
     
     difference() {
         translate([0,0,pulleyW/2]) rotate_extrude()
             rotate([0,0,-90]) polygon(points = [
                 // Main shape
+
+                    // Shaft
                 [pulleyW/2 + 6, shaftRadius], 
-                [pulleyW/2 + 6,pulleyR],
+
+                [pulleyW/2 + 6, shaftR], 
+                [pulleyW/2, shaftR], 
+
                 [pulleyW/2,pulleyR],
                 // Round for cable
                 [cableW/2,innerR], [0, innerR-cableW*.2], [-cableW/2,innerR],
-                [-pulleyW/2,pulleyR],
+                [-pulleyW/2 - 5,pulleyR + 5],
                 [-pulleyW/2,5],
                 [-pulleyW/2 + insetForAxel,5],
                 [-pulleyW/2 + insetForAxel, shaftRadius],
                 ]); 
-
+        
+          // screw hole
+          translate([0,0,-3])
+            rotate([0,90,0]) {
+              cylinder(h=shaftR, r=0.9);
+              translate([0,0,shaftR-1]) cylinder(h=1, r1=0.9, r2=1.5);
+            }
     }
          
  }
