@@ -3,6 +3,7 @@
  */
  
 use <spline.scad>
+use <stepper-driven-arm.scad>
 
 $fn = 80;
 
@@ -64,12 +65,19 @@ lidCorner=12;
 //m3_nut_trap(up=4, down=30);
 // rotate([0,180,0]) lid();
 drivePulley();
+//stepper_arm();
+//arm();
+//box();
+//test_box();
+//m3_nut_trap(up=4, down=30);
+//rotate([0,180,0]) lid();
+//pulley();
 //pulley_spacer();
 //test_undercarriage();
 //undercarriage();
 
 //exploded_view( explode = (cos($t*360)+1)*25);
-//exploded_view( explode = 30);
+exploded_view( explode = 0);
 
 module exploded_view(explode) {
     translate([0,height/2,width/2]) rotate([90,0,0]) {
@@ -79,21 +87,29 @@ module exploded_view(explode) {
     translate([length/2,0,-explode]) rotate([0,-90,0]) color("Gray") undercarriage();
      
     translate([0,0,width + explode]) {
-        for(rot=[0,180]) rotate([0,0,rot])
-            translate([(length)/2-armSize[1],0,0])
-                rotate([0,-90,180]) {
-                    color("Gray") arm();
-                    translate([armSize[0]-10,pulleyW/2,armSize[1]/2+explode])
-                        rotate([90,0,0]) color("Red") pulley();
-                }
+        translate([(length)/2-armSize[1],0,0])
+            rotate([0,-90,180]) {
+                color("Gray") arm();
+                translate([armSize[0]-10,pulleyW/2,armSize[1]/2+explode])
+                    rotate([90,0,0]) color("Red") pulley();
+            }
 
-            translate([0,(height) /2, 0])
-                rotate([0,-90,90]) {
-                    color("Gray") middlearm();
-                    translate([0,0,height]) rotate([0,180,0]) color("Gray") middlearm2();
-                    translate([lowerArmH + explode,0, (height-pulleyW)/2]) color("Red") pulley();
-                }
+        translate([0,(height) /2, 0])
+            rotate([0,-90,90]) {
+                color("Gray") middlearm();
+                translate([0,0,height]) rotate([0,180,0]) color("Gray") middlearm2();
+                translate([lowerArmH + explode,0, (height-pulleyW)/2]) color("Red") pulley();
+            }
         
+
+        rotate([0,0,180]) translate([(length)/2-armSize[1],0,0])
+            rotate([0,-90,180]) {
+                color("Gray") stepper_arm();
+                translate([armSize[0]-10,pulleyW/2,armSize[1]/2+explode])
+                    rotate([90,0,0]) color("Red") pulley();
+            }
+
+
     }
 }
 
