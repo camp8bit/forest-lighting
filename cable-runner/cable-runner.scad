@@ -392,7 +392,7 @@ module drivePulley() {
                 // Round for cable
                 [cableW/2,innerR], [0, innerR-cableW*.2], [-cableW/2,innerR],
                 [-pulleyW/2 - 5,pulleyR + 5],
-                [-pulleyW/2,5],
+                [-pulleyW/2 - 5,5],
                 [-pulleyW/2 + insetForAxel,5],
                 [-pulleyW/2 + insetForAxel, shaftRadius],
                 ]); 
