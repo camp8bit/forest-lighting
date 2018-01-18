@@ -52,7 +52,9 @@ middleArmBoltGap = 12.5;
 outerArmGap = height-armSize[2]*2;
 
 lidCorner=12;
-arm();
+rotate([90,0,0])
+  translate([0,25,0])
+    arm();
 
  module arm() {
      // Amount of arms that are purely vertical
