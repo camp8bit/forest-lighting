@@ -85,18 +85,6 @@ rotate([90,0,0])
                    translate([15,10,15])
                      rotate([90,0,0])
                        cylinder(h=100, r=1.5);
-
-                   translate([-15,10,15])
-                     rotate([90,0,0])
-                       cylinder(h=100, r=1.5);
-
-                   translate([-15,10,-15])
-                     rotate([90,0,0])
-                       cylinder(h=100, r=1.5);
-
-                   translate([15,10,-15])
-                     rotate([90,0,0])
-                       cylinder(h=100, r=1.5);
                }
            }
             
