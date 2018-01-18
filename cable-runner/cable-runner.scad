@@ -59,12 +59,11 @@ lidCorner=12;
 
 //middlearm(); translate([lowerArmH,50,0]) middlearm2();
 
-//arm();
 //box();
 //test_box();
 //m3_nut_trap(up=4, down=30);
-rotate([0,180,0]) lid();
-//pulley();
+// rotate([0,180,0]) lid();
+drivePulley();
 //pulley_spacer();
 //test_undercarriage();
 //undercarriage();
@@ -96,6 +95,36 @@ module exploded_view(explode) {
                 }
         
     }
+}
+
+
+ module drivenArm() {
+     // Amount of arms that are purely vertical
+     flatH = 14;
+     
+     translate([armSize[0]/2,0,0]) {
+         difference() {
+             //Main body
+             intersection() {
+                translate([0,0,armSize[1]/2])
+                    cube(size=[armSize[0], 25 * 2, 45], center=true);
+             }
+             
+             // One side
+             translate([20, 10, 0])
+               cube(size=[50, 50, 100], center = true);
+             
+             // Bolt holes
+             for(transZ = [armBoltGap, armBoltDistance])
+                translate([armSize[2]-armSize[0]/2+.01, 0, transZ])
+                    rotate([0,90,0]) m3_bolt_hole(length=40);
+         }
+     }
+     
+     wA = armSize[1]/2;
+     wB = armSize[2]/2;
+     h = armSize[0];
+     offset = armSize[2];
 }
 
 module lid() {
@@ -240,8 +269,6 @@ module box() {
                  translate([height - flatH,0,-50])
                     scale([bigR/smallR,1,1]) cylinder(h=100,r=smallR);
              }
-             // Flat part of the split
-//             translate([(armSize[0]-flatH)/2,0,0]) cube([flatH,smallR*2,50], center=true);
              
              // Bolt holes
              for(transZ = [armBoltGap, armBoltDistance])
@@ -263,25 +290,6 @@ module box() {
      wB = armSize[2]/2;
      h = armSize[0];
      offset = armSize[2];
-
-/*
-     linear_extrude(height=armSize[2])
-        polygon(points = [ [offset,-wA], [offset,wA], [h,wB], [h,-wB] ]); 
-     
-    // Arm
-//    translate([0,-armSize[1]/2,0])
-        //cube(size = armSize);
-
-    // Screw mount
-     translate([0,-armSize[1]/2,0])
-     cube(size = [armSize[2], armSize[1], axleL]);
-
-    // Brace
-    translate([0,wB,0])
-        rotate([90,0,0])
-            linear_extrude(height=thickness)
-                polygon(points = [ [offset,axleL], [offset,0], [h*.7,armSize[2] ] ]);
-*/    
 }
 
 module pulley_spacer() {
@@ -337,6 +345,35 @@ module middlearm(boltPull = 0) {
 module middlearm2() {
     scale([-1,1,1]) middlearm(boltPull = 10);
 }
+
+module drivePulley() {
+    bearingR = 11.25;
+    bearingW = 8;
+    bearingHold = 1;
+    cableW = 3; 
+    innerR = pulleyR - (pulleyW/2 - cableW / 2);
+    axleGap = axleR + 4;
+
+    //# cylinder(r=11, h= 20);
+
+    insetForAxel = pulleyW / 2 + 2;
+    
+    difference() {
+        translate([0,0,pulleyW/2]) rotate_extrude()
+            rotate([0,0,-90]) polygon(points = [
+                // Main shape
+                [pulleyW/2,2.5], [pulleyW/2,pulleyR],
+                // Round for cable
+                [cableW/2,innerR], [0, innerR-cableW*.2], [-cableW/2,innerR],
+                [-pulleyW/2,pulleyR],
+                [-pulleyW/2,5],
+                [-pulleyW/2 + insetForAxel,5],
+                [-pulleyW/2 + insetForAxel,2.5],
+                ]); 
+
+    }
+         
+ }
  
 module pulley() {
     bearingR = 11.25;
