@@ -81,7 +81,7 @@ rotate([90,0,0])
   
              // stepper mount holes
              translate([30,-20.5,10]) {
-               rotate([0,0,0]) {
+               for(scaleX=[-1,1], scaleZ=[-1,1]) scale([scaleX,1,scaleZ]) {
                    translate([15,10,15])
                      rotate([90,0,0])
                        cylinder(h=100, r=1.5);
