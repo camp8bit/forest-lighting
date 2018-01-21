@@ -4,6 +4,15 @@
 
 FASTLED_USING_NAMESPACE
 
+struct Edge {
+  byte x1;
+  byte y1;
+  byte z1;
+  byte x2;
+  byte y2;
+  byte z2;
+};
+
 // FastLED "100-lines-of-code" demo reel, showing just a few 
 // of the kinds of animation patterns you can quickly and easily 
 // compose using FastLED.  
@@ -80,7 +89,101 @@ byte beatPos = 0;
 // Time the next pattern switch
 long gNextSwitchTime = 0;
 
+CRGB testPattern (byte x, byte y, byte z) {
+  byte pulsePos = (long)beatPos * 255l / 60;
+  
+  switch (beatCount % 3) {
+    case 0:
+      if (abs(pulsePos - x) < 3) return CRGB::Red;
+      break;
 
+    case 1:
+      if (abs(pulsePos - y) < 3) return CRGB::Green;
+      break;
+
+    case 2:
+      if (abs(pulsePos - z) < 3) return CRGB::Blue;
+      break;
+  }
+  
+  return CRGB::Black;
+}
+
+void fillPattern () {
+  int i, j;
+  
+  for (i = 0; i < 24; i++) {
+    Edge e = getEdge(i);
+
+     for (j = 0; j < 60; j++) {
+       int x = j * (e.x2 - e.x1) / 60 + e.x1;
+       int y = j * (e.y2 - e.y1) / 60 + e.y1;
+       int z = j * (e.z2 - e.z1) / 60 + e.z1;
+       
+       leds[i * 60 + j] = testPattern(x, y, z);
+     }
+  }
+}
+
+Edge getEdge (int index) {
+  switch (index) {
+    // first sub pyramid
+    case 0:
+      return { 64, 128, 0, 128, 0, 0 };
+    case 1:
+      return { 128, 0, 0, 0, 0, 0 };
+    case 2:
+      return { 0, 0, 0, 64, 128, 0 };
+    case 3:
+      return { 64, 128, 0, 64, 64, 128 };
+    case 4:
+      return { 64, 64, 128, 0, 0, 0 };
+    case 5:
+      return { 64, 64, 128, 128, 0, 0 };
+
+    // second pyramid
+    case 6:
+      return { 128, 0, 0, 192, 128, 0 };
+    case 7:
+      return { 192, 128, 0, 255, 0, 0 };
+    case 8:
+      return { 255, 0, 0, 128, 0, 0 };
+    case 9:
+      return { 128, 0, 0, 192, 64, 128 };
+    case 10:
+      return { 192, 64, 128, 255, 0, 0 };
+    case 11:
+      return { 192, 64, 128, 192, 128, 0 };
+
+    // third pyramid
+    case 12:
+      return { 192, 128, 0, 64, 128, 0 };
+    case 13:
+      return { 64, 128, 0, 128, 255, 0 };
+    case 14:
+      return { 128, 255, 0, 192, 128, 0 };
+    case 15:
+      return { 192, 128, 0, 128, 192, 128 };
+    case 16:
+      return { 128, 192, 128, 128, 255, 0 };
+    case 17:
+      return { 128, 192, 128, 64, 128, 0 };
+
+    // last pyramid
+    case 18:
+      return { 128, 192, 128, 192, 64, 128 };
+    case 19:
+      return { 192, 64, 128, 64, 64, 128 };
+    case 20:
+      return { 64, 64, 128, 128, 192, 128 };
+    case 21:
+      return { 128, 192, 128, 128, 64, 255 };
+    case 22:
+      return { 128, 64, 255, 64, 64, 128 };
+    case 23:
+      return { 128, 64, 255, 192, 64, 128 };
+  }
+}
 ////////////////////////////////////////////
 // MAIN LOOP
 
